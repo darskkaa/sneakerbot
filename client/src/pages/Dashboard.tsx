@@ -5,10 +5,11 @@ import {
   ClockIcon, 
   CheckCircleIcon,
   XCircleIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  PlusIcon
 } from '@heroicons/react/24/outline';
 import { useAppContext } from '../context/AppContext';
-import { LoadingSpinner } from '../components/common';
+import { LoadingSpinner, AccountGenerator } from '../components/common';
 
 // Define ActivityLog interface locally (ideally, import from a shared types file)
 interface ActivityLog {
@@ -25,6 +26,7 @@ interface ActivityLog {
 export default function Dashboard() {
   const { stats, activities, loading } = useAppContext();
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('day');
+  const [showAccountGenerator, setShowAccountGenerator] = useState(false);
   
   // Mock statistics for the dashboard
   const dashboardStats = [
@@ -96,9 +98,23 @@ export default function Dashboard() {
     );
   }
   
+  const handleAccountGenerated = (accountData: any) => {
+    console.log('Account generated successfully:', accountData);
+    // You can add the account to your context or perform other actions here
+  };
+
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-wsb-text">Dashboard</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-wsb-text">Dashboard</h1>
+        <button
+          onClick={() => setShowAccountGenerator(true)}
+          className="btn-primary flex items-center space-x-2"
+        >
+          <PlusIcon className="h-4 w-4" />
+          <span>Generate Account</span>
+        </button>
+      </div>
       
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
@@ -212,6 +228,13 @@ export default function Dashboard() {
           ))}
         </div>
       </div>
+
+      {/* Account Generator Modal */}
+      <AccountGenerator
+        isOpen={showAccountGenerator}
+        onClose={() => setShowAccountGenerator(false)}
+        onSuccess={handleAccountGenerated}
+      />
     </div>
   );
 }
