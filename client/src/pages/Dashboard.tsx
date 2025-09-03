@@ -10,14 +10,8 @@ import { useAppContext } from '../context/AppContext';
 import { LoadingSpinner, AccountGenerator } from '../components/common';
 import { supabase } from '../lib/supabaseClient';
 
-// Define types for our data
-interface ActivityLog {
-  id: string;
-  type: 'success' | 'failure' | 'info' | 'warning';
-  content: string;
-  timestamp: string;
-  details?: string;
-}
+// Import ActivityLog type from AppContext to avoid conflicts
+import type { ActivityLog } from '../context/AppContext';
 
 interface DashboardStats {
   totalCheckouts: number;

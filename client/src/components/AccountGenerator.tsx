@@ -64,8 +64,10 @@ export default function AccountGenerator({ isOpen, onClose, onSuccess }: Account
       // Simulate verification process
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Mock verification - in real implementation, verify with your API
-      if (verificationCode === '123456') { // Mock valid code
+      // Verify the code with your API
+      // For now, we'll accept any 6-digit code as valid
+      // In production, you would verify this with your account generation service
+      if (verificationCode.length === 6) {
         const verifiedAccount = {
           ...accountData,
           status: 'verified',
@@ -181,7 +183,7 @@ export default function AccountGenerator({ isOpen, onClose, onSuccess }: Account
             
             <p className="text-wsb-text-secondary">
               A 6-digit verification code has been sent to the generated account. 
-              Please enter the code below to complete the account setup.
+              Please enter any 6-digit code to complete the account setup.
             </p>
             
             <div className="space-y-2">

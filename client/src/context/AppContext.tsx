@@ -57,9 +57,9 @@ interface DashboardStats {
   // Potentially add more stats as needed
 }
 
-interface ActivityLog {
+export interface ActivityLog {
   id: string; // or number
-  type: 'checkout_success' | 'task_created' | 'proxy_failed' | 'profile_updated' | 'settings_changed' | string; // Example types
+  type: 'checkout_success' | 'task_created' | 'proxy_failed' | 'profile_updated' | 'settings_changed' | 'success' | 'failure' | 'info' | 'warning'; // Example types
   content: string;
   timestamp: string; // ISO string or Date object
   user?: string; // Optional: if actions are user-specific
