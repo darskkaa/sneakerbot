@@ -48,18 +48,18 @@ interface UpdateNotificationProps {
 // Only import Electron-specific components when in Electron
 let UpdateNotification: React.FC<UpdateNotificationProps> = ({ isOpen, onClose, onInstall }) => 
   isOpen ? (
-    <div className="fixed bottom-4 right-4 bg-wsb-dark-600 p-4 rounded-lg shadow-lg z-50">
-      <p className="text-white">Update available! Restart the app to install.</p>
+    <div className="fixed bottom-4 right-4 bg-wsb-dark-panel p-4 rounded-lg shadow-lg z-50">
+      <p className="text-wsb-text">Update available! Restart the app to install.</p>
       <div className="flex justify-end mt-2 space-x-2">
         <button 
           onClick={onClose}
-          className="px-3 py-1 text-sm bg-wsb-dark-500 hover:bg-wsb-dark-400 rounded"
+          className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 rounded text-wsb-text"
         >
           Later
         </button>
         <button 
           onClick={onInstall}
-          className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 rounded"
+          className="px-3 py-1 text-sm bg-wsb-primary hover:bg-blue-700 rounded text-white"
         >
           Restart & Install
         </button>
