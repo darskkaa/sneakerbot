@@ -14,7 +14,7 @@ import { supabase } from '../lib/supabaseClient';
 interface ActivityLog {
   id: string;
   type: 'success' | 'failure' | 'info' | 'warning';
-  message: string;
+  content: string;
   timestamp: string;
   details?: string;
 }
@@ -68,7 +68,7 @@ const ActivityItem = ({ activity }: { activity: ActivityLog }) => {
         {getActivityIcon()}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-white">{activity.message}</p>
+        <p className="text-sm font-medium text-white">{activity.content}</p>
         {activity.details && (
           <p className="text-sm text-gray-400 mt-1">{activity.details}</p>
         )}
