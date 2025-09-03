@@ -20,7 +20,7 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center h-screen bg-wsb-dark-base">
-      <div className="bg-dark-panel p-8 rounded-lg w-full max-w-md">
+      <div className="bg-wsb-dark-panel p-8 rounded-lg w-full max-w-md">
         <h1 className="text-2xl font-bold text-white mb-6">Sign In</h1>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
@@ -30,7 +30,7 @@ export default function Login() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 mb-4 rounded bg-wsb-dark-600 text-white"
+            className="w-full p-2 mb-4 rounded bg-gray-800 text-white border border-gray-700 focus:border-wsb-primary focus:outline-none"
           />
           <label className="block text-gray-400">Password</label>
           <input
@@ -38,7 +38,7 @@ export default function Login() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 mb-4 rounded bg-wsb-dark-600 text-white"
+            className="w-full p-2 mb-4 rounded bg-gray-800 text-white border border-gray-700 focus:border-wsb-primary focus:outline-none"
           />
           <button
             type="submit"
