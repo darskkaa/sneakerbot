@@ -10,9 +10,9 @@ if (!supabaseUrl || !supabaseKey) {
   console.warn('VITE_SUPABASE_KEY=your_supabase_anon_key_here');
   
   // Create a mock client for development
-  if (import.meta.env.DEV) {
+  if (import.meta.env.MODE === 'development') {
     console.warn('Using mock Supabase client for development');
-    export const supabase = {
+    const supabase = {
       from: () => ({
         select: () => Promise.resolve({ data: [], error: null }),
         insert: () => Promise.resolve({ data: null, error: { message: 'Mock client - no database connection' } }),
@@ -30,5 +30,7 @@ if (!supabaseUrl || !supabaseKey) {
     throw new Error('Supabase environment variables are required in production. Please set VITE_SUPABASE_URL and VITE_SUPABASE_KEY.');
   }
 } else {
-  export const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabase = createClient(supabaseUrl, supabaseKey);
 }
+
+export { supabase };

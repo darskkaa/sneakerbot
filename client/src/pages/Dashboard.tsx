@@ -1,8 +1,6 @@
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
-  ArrowUpIcon, 
-  ArrowDownIcon, 
-  ClockIcon, 
+  ClockIcon,
   CheckCircleIcon,
   XCircleIcon,
   InformationCircleIcon,
@@ -11,92 +9,146 @@ import {
 import { useAppContext } from '../context/AppContext';
 import { LoadingSpinner, AccountGenerator } from '../components/common';
 
-// Define ActivityLog interface locally (ideally, import from a shared types file)
+// Define types for our data
 interface ActivityLog {
-  id: string; // or number
-  type: 'checkout_success' | 'task_created' | 'proxy_failed' | 'profile_updated' | 'settings_changed' | string; // Example types
-  content: string;
-  timestamp: string; // ISO string or Date object
-  user?: string; // Optional: if actions are user-specific
-  relatedId?: string | number; // Optional: ID of related task, profile, proxy etc.
-  details?: string; // Optional: additional details for the activity
+  id: string;
+  type: 'success' | 'failure' | 'info' | 'warning';
+  message: string;
+  timestamp: string;
+  details?: string;
 }
 
+interface DashboardStats {
+  totalCheckouts: number;
+  activeTasks: number;
+  successRate: number;
+  failedAttempts: number;
+}
+
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+}
+
+// StatCard component for displaying individual statistics
+const StatCard = ({ title, value, icon }: StatCardProps) => (
+  <div className="bg-dark-panel rounded-lg p-6 shadow">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm font-medium text-gray-400">{title}</p>
+        <p className="mt-1 text-2xl font-semibold text-white">{value}</p>
+      </div>
+      <div className="rounded-full bg-dark-panel p-3">
+        {icon}
+      </div>
+    </div>
+  </div>
+);
+
+// ActivityItem component for displaying individual activity logs
+const ActivityItem = ({ activity }: { activity: ActivityLog }) => {
+  const getActivityIcon = () => {
+    switch (activity.type) {
+      case 'success':
+        return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
+      case 'failure':
+        return <XCircleIcon className="h-5 w-5 text-red-500" />;
+      case 'warning':
+        return <InformationCircleIcon className="h-5 w-5 text-yellow-500" />;
+      default:
+        return <InformationCircleIcon className="h-5 w-5 text-blue-500" />;
+    }
+  };
+
+  return (
+    <div className="flex items-start space-x-3 p-4 hover:bg-dark-panel/50 rounded-lg transition-colors">
+      <div className="flex-shrink-0 mt-0.5">
+        {getActivityIcon()}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-white">{activity.message}</p>
+        {activity.details && (
+          <p className="text-sm text-gray-400 mt-1">{activity.details}</p>
+        )}
+        <p className="text-xs text-gray-500 mt-1">{activity.timestamp}</p>
+      </div>
+    </div>
+  );
+};
 
 export default function Dashboard() {
   const { stats, activities, loading } = useAppContext();
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('day');
   const [showAccountGenerator, setShowAccountGenerator] = useState(false);
   
-  // Mock statistics for the dashboard
-  const dashboardStats = [
-    {
-      title: 'Total Checkouts',
-      value: stats?.totalCheckouts || 0,
-      change: 12.5,
-      changeType: 'positive',
-      icon: <CheckCircleIcon className="h-6 w-6 text-wsb-success" />
-    },
-    {
-      title: 'Success Rate',
-      value: `${stats?.successRate || 0}%`,
-      change: -2.3,
-      changeType: 'negative',
-      icon: <InformationCircleIcon className="h-6 w-6 text-wsb-primary" />
-    },
-    {
-      title: 'Active Tasks',
-      value: stats?.activeTasks || 0,
-      changeType: 'neutral',
-      icon: <ClockIcon className="h-6 w-6 text-wsb-warning" />
-    },
-    {
-      title: 'Failed Attempts',
-      value: stats?.failedAttempts || 0,
-      change: -8.1,
-      changeType: 'positive',
-      icon: <XCircleIcon className="h-6 w-6 text-wsb-error" />
-    }
-  ];
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
   
-  // Mock recent activities
-  const recentActivities = activities || [
-    {
-      id: '1',
-      type: 'success',
-      message: 'Successfully checked out Nike Dunk Low "Panda"',
-      timestamp: '10 min ago',
-      details: 'Size: US 10, Price: $110'
-    },
-    {
-      id: '2',
-      type: 'failure',
-      message: 'Failed to checkout Jordan 4 "Military Black"',
-      timestamp: '25 min ago',
-      details: 'Error: Payment verification failed'
-    },
-    {
-      id: '3',
-      type: 'info',
-      message: 'Added 5 new proxies to "Residential" group',
-      timestamp: '1 hour ago'
-    },
-    {
-      id: '4',
-      type: 'success',
-      message: 'Successfully checked out Yeezy Boost 350 "Beluga"',
-      timestamp: '3 hours ago',
-      details: 'Size: US 9, Price: $220'
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch stats from Supabase
+      const { data: statsData, error: statsError } = await supabase
+        .from('dashboard_stats')
+        .select('*')
+        .single();
+      
+      if (statsError) throw statsError;
+      
+      // Fetch recent activities
+      const { data: activitiesData, error: activitiesError } = await supabase
+        .from('activities')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10);
+      
+      if (activitiesError) throw activitiesError;
+      
+      // Transform activities data to match our interface
+      const formattedActivities: ActivityLog[] = (activitiesData || []).map((activity: any) => ({
+        id: activity.id,
+        type: (activity.type || 'info') as 'success' | 'failure' | 'info' | 'warning',
+        message: activity.message || 'No message',
+        timestamp: activity.created_at ? new Date(activity.created_at).toLocaleString() : 'Unknown time',
+        details: activity.details
+      }));
+      
+      if (statsData) {
+        setStats({
+          totalCheckouts: statsData.total_checkouts || 0,
+          activeTasks: statsData.active_tasks || 0,
+          successRate: statsData.success_rate || 0,
+          failedAttempts: statsData.failed_attempts || 0
+        });
+      }
+      
+      setActivities(formattedActivities);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      // Set some default data in case of error
+      setActivities([{
+        id: 'error',
+        type: 'failure',
+        message: 'Failed to load activities',
+        timestamp: new Date().toLocaleString(),
+        details: 'Please check your internet connection and try again.'
+      }]);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
   
-  if (loading?.stats || loading?.activities) {
+  if (loading) {
     return (
       <div className="flex justify-center py-20">
         <LoadingSpinner size="lg" />
       </div>
     );
   }
+<<<<<<< HEAD
   
   const handleAccountGenerated = (accountData: any) => {
     console.log('Account generated successfully:', accountData);
@@ -118,114 +170,71 @@ export default function Dashboard() {
       
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+=======
+
+  // Prepare dashboard stats for display
+  const dashboardStats = [
+    {
+      title: 'Total Checkouts',
+      value: stats.totalCheckouts,
+      icon: <CheckCircleIcon className="h-6 w-6 text-green-500" />
+    },
+    {
+      title: 'Success Rate',
+      value: `${stats.successRate}%`,
+      icon: <InformationCircleIcon className="h-6 w-6 text-blue-500" />
+    },
+    {
+      title: 'Active Tasks',
+      value: stats.activeTasks,
+      icon: <ClockIcon className="h-6 w-6 text-yellow-500" />
+    },
+    {
+      title: 'Failed Attempts',
+      value: stats.failedAttempts,
+      icon: <XCircleIcon className="h-6 w-6 text-red-500" />
+    }
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <p className="mt-1 text-sm text-gray-400">
+          Overview of your sneaker bot activities and performance.
+        </p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+>>>>>>> 6238b7c98f31689591b97dbbe85cad0cfe5c995b
         {dashboardStats.map((stat, index) => (
-          <div key={index} className="card">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-wsb-text-secondary text-sm">{stat.title}</p>
-                <p className="text-2xl font-semibold text-wsb-text mt-1">{stat.value}</p>
-                
-                {stat.change !== undefined && (
-                  <div className="flex items-center mt-1">
-                    {stat.changeType === 'positive' ? (
-                      <ArrowUpIcon className="h-3 w-3 text-wsb-success mr-1" />
-                    ) : stat.changeType === 'negative' ? (
-                      <ArrowDownIcon className="h-3 w-3 text-wsb-error mr-1" />
-                    ) : null}
-                    
-                    <span 
-                      className={`text-xs ${
-                        stat.changeType === 'positive' 
-                          ? 'text-wsb-success' 
-                          : stat.changeType === 'negative' 
-                            ? 'text-wsb-error' 
-                            : 'text-wsb-text-secondary'
-                      }`}
-                    >
-                      {stat.changeType !== 'neutral' && Math.abs(stat.change).toFixed(1)}%
-                      {stat.changeType === 'positive' ? ' increase' : stat.changeType === 'negative' ? ' decrease' : ''}
-                    </span>
-                  </div>
-                )}
-              </div>
-              
-              <div className="p-2 rounded-lg bg-gray-800">
-                {stat.icon}
-              </div>
-            </div>
-          </div>
+          <StatCard
+            key={index}
+            title={stat.title}
+            value={stat.value}
+            icon={stat.icon}
+          />
         ))}
       </div>
-      
-      {/* Time Frame Selector */}
-      <div className="flex space-x-2">
-        <button
-          onClick={() => setTimeframe('day')}
-          className={`px-3 py-1 rounded-md text-sm ${
-            timeframe === 'day'
-              ? 'bg-wsb-primary text-white'
-              : 'bg-gray-800 text-wsb-text-secondary hover:bg-gray-700'
-          }`}
-        >
-          Today
-        </button>
-        <button
-          onClick={() => setTimeframe('week')}
-          className={`px-3 py-1 rounded-md text-sm ${
-            timeframe === 'week'
-              ? 'bg-wsb-primary text-white'
-              : 'bg-gray-800 text-wsb-text-secondary hover:bg-gray-700'
-          }`}
-        >
-          This Week
-        </button>
-        <button
-          onClick={() => setTimeframe('month')}
-          className={`px-3 py-1 rounded-md text-sm ${
-            timeframe === 'month'
-              ? 'bg-wsb-primary text-white'
-              : 'bg-gray-800 text-wsb-text-secondary hover:bg-gray-700'
-          }`}
-        >
-          This Month
-        </button>
-      </div>
-      
-      {/* Recent Activity */}
-      <div className="card">
-        <h2 className="text-lg font-medium text-wsb-text mb-4">Recent Activity</h2>
-        
-        <div className="space-y-4">
-          {recentActivities.map((activity: ActivityLog) => (
-            <div key={activity.id} className="flex items-start space-x-3 py-2 border-b border-gray-700 last:border-0">
-              <div className={`p-1.5 rounded-full ${
-                activity.type === 'success' 
-                  ? 'bg-wsb-success bg-opacity-20' 
-                  : activity.type === 'failure'
-                    ? 'bg-wsb-error bg-opacity-20'
-                    : 'bg-wsb-primary bg-opacity-20'
-              }`}>
-                {activity.type === 'success' ? (
-                  <CheckCircleIcon className="h-5 w-5 text-wsb-success" />
-                ) : activity.type === 'failure' ? (
-                  <XCircleIcon className="h-5 w-5 text-wsb-error" />
-                ) : (
-                  <InformationCircleIcon className="h-5 w-5 text-wsb-primary" />
-                )}
+
+      {/* Recent Activities */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-medium text-white">Recent Activities</h2>
+        </div>
+        <div className="mt-4 overflow-hidden bg-dark-panel rounded-lg shadow">
+          <div className="divide-y divide-gray-700">
+            {activities.length > 0 ? (
+              activities.map((activity) => (
+                <ActivityItem key={activity.id} activity={activity} />
+              ))
+            ) : (
+              <div className="p-6 text-center text-gray-400">
+                No activities found
               </div>
-              
-              <div className="flex-1">
-                <div className="flex justify-between">
-                  <p className="text-wsb-text font-medium">{activity.content}</p>
-                  <span className="text-xs text-wsb-text-secondary">{activity.timestamp}</span>
-                </div>
-                
-                {activity.details && (
-                  <p className="text-sm text-wsb-text-secondary mt-1">{activity.details}</p>
-                )}
-              </div>
-            </div>
-          ))}
+            )}
+          </div>
         </div>
       </div>
 

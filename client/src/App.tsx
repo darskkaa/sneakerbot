@@ -1,4 +1,7 @@
 import { useState, createContext, useContext, useCallback, useEffect } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/layout/Sidebar';
 import Tasks from './pages/Tasks';
@@ -9,20 +12,16 @@ import Settings from './pages/Settings';
 import Dashboard from './pages/Dashboard';
 import { AppContextProvider } from './context/AppContext';
 import ToastContainer from './components/notifications/ToastContainer';
+import LoadingSpinner from './components/common/LoadingSpinner';
 
 // Extend Window interface to include Electron and Node.js types
 interface CustomWindow extends Window {
-  // Allow require in the renderer process
   require: NodeRequire;
-  
-  // Electron specific APIs
   electron?: {
     onUpdateAvailable: (callback: () => void) => () => void;
     onUpdateDownloaded: (callback: () => void) => () => void;
     installUpdate: () => void;
   };
-  
-  // Add this to fix TypeScript errors for process
   process?: {
     env: {
       NODE_ENV: string;
@@ -46,7 +45,7 @@ interface UpdateNotificationProps {
 }
 
 // Only import Electron-specific components when in Electron
-let UpdateNotification: React.FC<UpdateNotificationProps> = ({ isOpen, onClose, onInstall }) => 
+const UpdateNotification: React.FC<UpdateNotificationProps> = ({ isOpen, onClose, onInstall }) => 
   isOpen ? (
     <div className="fixed bottom-4 right-4 bg-wsb-dark-panel p-4 rounded-lg shadow-lg z-50">
       <p className="text-wsb-text">Update available! Restart the app to install.</p>
@@ -99,6 +98,14 @@ export function useToast() {
 }
 
 function App() {
+  // Route guard for authenticated pages
+  const RequireAuth = ({ children }: { children: JSX.Element }) => {
+    const { user, loading } = useAuth();
+    if (loading) return <div className="flex justify-center py-20"><LoadingSpinner size="lg"/></div>;
+    if (!user) return <Navigate to="/login" replace />;
+    return children;
+  };
+
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateDownloaded, setUpdateDownloaded] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -140,47 +147,51 @@ function App() {
   }, []);
 
   return (
-    <AppContextProvider>
-      <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
-        <div className="flex h-screen overflow-hidden bg-wsb-dark-base">
-          {/* Sidebar */}
-          <Sidebar />
+    <AuthProvider>
+      <AppContextProvider>
+        <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
+          <div className="flex h-screen overflow-hidden bg-wsb-dark-base">
+            {/* Sidebar */}
+            <Sidebar />
 
-          {/* Main content */}
-          <main className="flex-1 overflow-y-auto">
-            <div className="p-6">
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/tasks" element={<Tasks />} />
-                <Route path="/tasks/:id" element={<TaskDetail />} />
-                <Route path="/profiles" element={<Profiles />} />
-                <Route path="/proxies" element={<Proxies />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </div>
-          </main>
+            {/* Main content */}
+            <main className="flex-1 overflow-y-auto">
+              <div className="p-6">
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<Signup />} />
+                  <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
+                  <Route path="/tasks" element={<RequireAuth><Tasks /></RequireAuth>} />
+                  <Route path="/tasks/:id" element={<RequireAuth><TaskDetail /></RequireAuth>} />
+                  <Route path="/profiles" element={<RequireAuth><Profiles /></RequireAuth>} />
+                  <Route path="/proxies" element={<RequireAuth><Proxies /></RequireAuth>} />
+                  <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </div>
+            </main>
 
-          {/* Update notification - only shown in Electron */}
-          {isElectron && (updateAvailable || updateDownloaded) && (
-            <UpdateNotification
-              isOpen={updateAvailable}
-              onClose={() => setUpdateAvailable(false)}
-              onInstall={() => {
-                if (window.electron) {
-                  window.electron.installUpdate();
-                }
-                setUpdateAvailable(false);
-                setUpdateDownloaded(false);
-              }}
-            />
-          )}
+            {/* Update notification - only shown in Electron */}
+            {isElectron && (updateAvailable || updateDownloaded) && (
+              <UpdateNotification
+                isOpen={updateAvailable}
+                onClose={() => setUpdateAvailable(false)}
+                onInstall={() => {
+                  if (window.electron) {
+                    window.electron.installUpdate();
+                  }
+                  setUpdateAvailable(false);
+                  setUpdateDownloaded(false);
+                }}
+              />
+            )}
 
-          {/* Toast notifications */}
-          <ToastContainer />
-        </div>
-      </ToastContext.Provider>
-    </AppContextProvider>
+            {/* Toast notifications */}
+            <ToastContainer />
+          </div>
+        </ToastContext.Provider>
+      </AppContextProvider>
+    </AuthProvider>
   );
 }
 
