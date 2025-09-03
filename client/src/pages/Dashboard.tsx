@@ -8,6 +8,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useAppContext } from '../context/AppContext';
 import { LoadingSpinner, AccountGenerator } from '../components/common';
+import { supabase } from '../lib/supabaseClient';
 
 // Define types for our data
 interface ActivityLog {
@@ -82,64 +83,7 @@ export default function Dashboard() {
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('day');
   const [showAccountGenerator, setShowAccountGenerator] = useState(false);
   
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-  
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch stats from Supabase
-      const { data: statsData, error: statsError } = await supabase
-        .from('dashboard_stats')
-        .select('*')
-        .single();
-      
-      if (statsError) throw statsError;
-      
-      // Fetch recent activities
-      const { data: activitiesData, error: activitiesError } = await supabase
-        .from('activities')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(10);
-      
-      if (activitiesError) throw activitiesError;
-      
-      // Transform activities data to match our interface
-      const formattedActivities: ActivityLog[] = (activitiesData || []).map((activity: any) => ({
-        id: activity.id,
-        type: (activity.type || 'info') as 'success' | 'failure' | 'info' | 'warning',
-        message: activity.message || 'No message',
-        timestamp: activity.created_at ? new Date(activity.created_at).toLocaleString() : 'Unknown time',
-        details: activity.details
-      }));
-      
-      if (statsData) {
-        setStats({
-          totalCheckouts: statsData.total_checkouts || 0,
-          activeTasks: statsData.active_tasks || 0,
-          successRate: statsData.success_rate || 0,
-          failedAttempts: statsData.failed_attempts || 0
-        });
-      }
-      
-      setActivities(formattedActivities);
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      // Set some default data in case of error
-      setActivities([{
-        id: 'error',
-        type: 'failure',
-        message: 'Failed to load activities',
-        timestamp: new Date().toLocaleString(),
-        details: 'Please check your internet connection and try again.'
-      }]);
-    } finally {
-      setLoading(false);
-    }
-  };
+
   
   if (loading) {
     return (
@@ -148,17 +92,40 @@ export default function Dashboard() {
       </div>
     );
   }
-<<<<<<< HEAD
-  
+
   const handleAccountGenerated = (accountData: any) => {
     console.log('Account generated successfully:', accountData);
     // You can add the account to your context or perform other actions here
   };
 
+  // Prepare dashboard stats for display
+  const dashboardStats = [
+    {
+      title: 'Total Checkouts',
+      value: stats?.totalCheckouts || 0,
+      icon: <CheckCircleIcon className="h-6 w-6 text-green-500" />
+    },
+    {
+      title: 'Success Rate',
+      value: `${stats?.successRate || 0}%`,
+      icon: <InformationCircleIcon className="h-6 w-6 text-blue-500" />
+    },
+    {
+      title: 'Active Tasks',
+      value: stats?.activeTasks || 0,
+      icon: <ClockIcon className="h-6 w-6 text-yellow-500" />
+    },
+    {
+      title: 'Failed Attempts',
+      value: stats?.failedAttempts || 0,
+      icon: <XCircleIcon className="h-6 w-6 text-red-500" />
+    }
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-wsb-text">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
         <button
           onClick={() => setShowAccountGenerator(true)}
           className="btn-primary flex items-center space-x-2"
@@ -167,47 +134,9 @@ export default function Dashboard() {
           <span>Generate Account</span>
         </button>
       </div>
-      
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-=======
-
-  // Prepare dashboard stats for display
-  const dashboardStats = [
-    {
-      title: 'Total Checkouts',
-      value: stats.totalCheckouts,
-      icon: <CheckCircleIcon className="h-6 w-6 text-green-500" />
-    },
-    {
-      title: 'Success Rate',
-      value: `${stats.successRate}%`,
-      icon: <InformationCircleIcon className="h-6 w-6 text-blue-500" />
-    },
-    {
-      title: 'Active Tasks',
-      value: stats.activeTasks,
-      icon: <ClockIcon className="h-6 w-6 text-yellow-500" />
-    },
-    {
-      title: 'Failed Attempts',
-      value: stats.failedAttempts,
-      icon: <XCircleIcon className="h-6 w-6 text-red-500" />
-    }
-  ];
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-        <p className="mt-1 text-sm text-gray-400">
-          Overview of your sneaker bot activities and performance.
-        </p>
-      </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
->>>>>>> 6238b7c98f31689591b97dbbe85cad0cfe5c995b
         {dashboardStats.map((stat, index) => (
           <StatCard
             key={index}
