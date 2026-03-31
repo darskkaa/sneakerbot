@@ -22,11 +22,11 @@ export default function EmptyState({
   
   return (
     <div className="flex flex-col items-center justify-center text-center p-12">
-      <div className="rounded-full bg-gray-800 p-3 mb-4">
-        <IconComponent className="h-8 w-8 text-wsb-text-secondary" aria-hidden="true" />
+      <div className="rounded-full bg-secondary p-3 mb-4">
+        <IconComponent className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
       </div>
-      <h3 className="text-lg font-medium text-wsb-text mb-2">{title}</h3>
-      <p className="text-sm text-wsb-text-secondary max-w-md mb-6">{description}</p>
+      <h3 className="text-sm font-semibold text-foreground mb-1">{title}</h3>
+      <p className="text-sm text-muted-foreground max-w-md mb-5">{description}</p>
       
       {actionText && onAction && (
         <button

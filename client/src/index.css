@@ -4,64 +4,224 @@
 
 @layer base {
   :root {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 217 33% 17%;
+    --card-foreground: 210 40% 98%;
+    --popover: 217 33% 17%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 25% 22%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 215 25% 22%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 239 84% 67%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 215 19% 27%;
+    --input: 215 19% 27%;
+    --ring: 239 84% 67%;
+    --radius: 0.5rem;
+
+    /* Legacy */
+    --wsb-primary: 239 84% 67%;
+    --wsb-success: 160 84% 39%;
+    --wsb-error: 0 84% 60%;
+    --wsb-warning: 38 92% 50%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
     @apply antialiased;
   }
-  
+
   body {
-    @apply h-screen overflow-hidden;
+    @apply bg-background text-foreground h-screen overflow-hidden;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(215 20% 40%);
   }
 }
 
 @layer components {
+  /* Buttons */
   .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-wsb-primary;
+    @apply inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium
+           transition-all duration-150 focus-visible:outline-none focus-visible:ring-2
+           focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background
+           disabled:pointer-events-none disabled:opacity-50 select-none;
   }
-  
+
   .btn-primary {
-    @apply btn bg-wsb-primary text-white hover:bg-blue-700;
+    @apply btn bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2;
   }
-  
+
   .btn-secondary {
-    @apply btn bg-wsb-dark-panel text-wsb-text hover:bg-gray-800;
+    @apply btn bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border px-4 py-2;
   }
-  
-  .btn-success {
-    @apply btn bg-wsb-success text-white hover:bg-green-700;
+
+  .btn-ghost {
+    @apply btn text-muted-foreground hover:bg-secondary hover:text-foreground px-4 py-2;
   }
-  
+
+  .btn-destructive {
+    @apply btn bg-destructive text-destructive-foreground hover:bg-destructive/90 px-4 py-2;
+  }
+
   .btn-error {
-    @apply btn bg-wsb-error text-white hover:bg-red-700;
+    @apply btn-destructive;
   }
-  
+
+  .btn-success {
+    @apply btn bg-success text-white hover:bg-success/90 px-4 py-2;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .btn-icon {
+    @apply btn h-8 w-8 p-0;
+  }
+
+  /* Cards */
   .card {
-    @apply bg-wsb-dark-panel rounded-lg shadow-lg p-4;
+    @apply bg-card rounded-lg border border-border shadow-sm;
   }
-  
+
+  /* Form elements */
   .form-input {
-    @apply block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-wsb-primary focus:border-wsb-primary bg-gray-800 text-wsb-text;
+    @apply flex h-9 w-full rounded-md border border-input bg-secondary px-3 py-2
+           text-sm text-foreground placeholder:text-muted-foreground
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+           focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50
+           transition-colors;
   }
-  
+
   .form-label {
-    @apply block text-sm font-medium text-wsb-text mb-1;
+    @apply block text-sm font-medium text-foreground mb-1.5;
   }
-  
+
+  /* Status badges */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .badge-idle {
+    @apply badge bg-muted text-muted-foreground;
+  }
+
+  .badge-running {
+    @apply badge bg-primary/15 text-primary;
+  }
+
+  .badge-success {
+    @apply badge bg-success/15 text-success;
+  }
+
+  .badge-error {
+    @apply badge bg-destructive/15 text-destructive;
+  }
+
+  .badge-warning {
+    @apply badge bg-warning/15 text-warning;
+  }
+
+  /* Status dot */
+  .status-dot {
+    @apply inline-block w-1.5 h-1.5 rounded-full;
+  }
+
+  .status-dot-running {
+    @apply status-dot bg-primary animate-pulse;
+  }
+
+  .status-dot-success {
+    @apply status-dot bg-success;
+  }
+
+  .status-dot-error {
+    @apply status-dot bg-destructive;
+  }
+
+  .status-dot-idle {
+    @apply status-dot bg-muted-foreground;
+  }
+
+  /* Task status */
   .task-status-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply badge;
   }
-  
+
   .status-idle {
-    @apply task-status-badge bg-gray-700 text-gray-200;
+    @apply badge-idle;
   }
-  
+
   .status-running {
-    @apply task-status-badge bg-blue-700 text-blue-100;
+    @apply badge-running;
   }
-  
+
   .status-success {
-    @apply task-status-badge bg-green-700 text-green-100;
+    @apply badge-success;
   }
-  
+
   .status-error {
-    @apply task-status-badge bg-red-700 text-red-100;
+    @apply badge-error;
+  }
+
+  /* Nav item */
+  .nav-item {
+    @apply flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium
+           text-muted-foreground hover:text-foreground hover:bg-secondary
+           transition-colors duration-150 cursor-pointer;
+  }
+
+  .nav-item-active {
+    @apply nav-item bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary;
+  }
+
+  /* Table */
+  .data-table {
+    @apply w-full text-sm;
+  }
+
+  .data-table th {
+    @apply px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wide;
+  }
+
+  .data-table td {
+    @apply px-4 py-3 text-foreground;
+  }
+
+  .data-table tbody tr {
+    @apply border-t border-border hover:bg-secondary/40 transition-colors duration-100;
+  }
+
+  /* Divider */
+  .divider {
+    @apply border-t border-border;
+  }
+
+  /* Stat card */
+  .stat-card {
+    @apply card p-5 flex flex-col gap-3;
   }
 }

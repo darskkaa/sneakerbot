@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { PlusIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { Plus, RefreshCw, Upload } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { EmptyState, LoadingSpinner } from '../components/common';
 import ProxyForm from '../components/proxies/ProxyForm';
 import ProxyImporter from '../components/proxies/ProxyImporter';
 import ProxyList from '../components/proxies/ProxyList';
 import { useToast } from '../App';
+import { cn } from '../lib/utils';
 
 export default function Proxies() {
   const { proxies, loading, testProxy } = useAppContext();
@@ -15,190 +16,97 @@ export default function Proxies() {
   const [editingProxy, setEditingProxy] = useState<any>(null);
   const [isHealthCheckRunning, setIsHealthCheckRunning] = useState(false);
   const [lastHealthCheck, setLastHealthCheck] = useState<Date | null>(null);
-  
-  // Open proxy form for adding a new proxy
-  const openProxyForm = () => {
-    setEditingProxy(null);
-    setIsFormOpen(true);
-  };
-  
-  // Open proxy form for editing an existing proxy
-  const openProxyFormForEdit = (proxy: any) => {
-    setEditingProxy(proxy);
-    setIsFormOpen(true);
-  };
-  
-  // Close proxy form
-  const closeProxyForm = () => {
-    setIsFormOpen(false);
-    setEditingProxy(null);
-  };
-  
-  // Open proxy importer
-  const openProxyImporter = () => {
-    setIsImporterOpen(true);
-  };
-  
-  // Close proxy importer
-  const closeProxyImporter = () => {
-    setIsImporterOpen(false);
-  };
-  
-  // Run a health check on all proxies
+
   const runHealthCheck = useCallback(async () => {
-    if (!proxies || proxies.length === 0 || isHealthCheckRunning) {
-      return;
-    }
-    
+    if (!proxies?.length || isHealthCheckRunning) return;
     setIsHealthCheckRunning(true);
-    
     try {
-      addToast({
-        type: 'info',
-        title: 'Health Check Started',
-        message: `Testing ${proxies.length} proxies. This may take a few minutes.`,
-        duration: 5000,
-      });
-      
-      let successCount = 0;
-      let failCount = 0;
-      
-      // Test proxies in batches of 5 to avoid overwhelming the system
+      addToast({ type: 'info', title: 'Health Check Started', message: `Testing ${proxies.length} proxies.` });
+      let ok = 0, fail = 0;
       const batchSize = 5;
       for (let i = 0; i < proxies.length; i += batchSize) {
-        const batch = proxies.slice(i, i + batchSize);
-        
         await Promise.all(
-          batch.map(async (proxy) => {
-            try {
-              await testProxy(proxy.id);
-              successCount++;
-            } catch (error) {
-              console.error(`Error testing proxy ${proxy.id}:`, error);
-              failCount++;
-            }
+          proxies.slice(i, i + batchSize).map(async (proxy) => {
+            try { await testProxy(proxy.id); ok++; } catch { fail++; }
           })
         );
       }
-      
       setLastHealthCheck(new Date());
-      
-      addToast({
-        type: 'success',
-        title: 'Health Check Completed',
-        message: `Successfully tested ${successCount} proxies. ${failCount} tests failed.`,
-        duration: 5000,
-      });
-    } catch (error) {
-      console.error('Error running health check:', error);
-      addToast({
-        type: 'error',
-        title: 'Health Check Failed',
-        message: 'An error occurred while running the health check.',
-        duration: 5000,
-      });
+      addToast({ type: 'success', title: 'Health Check Done', message: `${ok} passed, ${fail} failed.` });
+    } catch {
+      addToast({ type: 'error', title: 'Health Check Failed', message: 'An error occurred.' });
     } finally {
       setIsHealthCheckRunning(false);
     }
   }, [proxies, isHealthCheckRunning, testProxy, addToast]);
-  
-  // Automatic health check every 5 minutes if there are proxies
+
   useEffect(() => {
-    if (!proxies || proxies.length === 0) {
-      return;
-    }
-    
-    // Run a health check when the component mounts
-    if (!lastHealthCheck) {
-      runHealthCheck();
-    }
-    
-    // Set up a 5-minute interval for health checks
-    const interval = setInterval(() => {
-      runHealthCheck();
-    }, 5 * 60 * 1000); // 5 minutes
-    
+    if (!proxies?.length || lastHealthCheck) return;
+    runHealthCheck();
+    const interval = setInterval(runHealthCheck, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [proxies, lastHealthCheck, runHealthCheck]);
-  
+
   if (loading?.proxies) {
-    return (
-      <div className="flex justify-center py-20">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+    return <div className="flex items-center justify-center py-24"><LoadingSpinner size="lg" /></div>;
   }
-  
+
+  const workingCount = proxies?.filter(p => p.status === 'working').length ?? 0;
+  const failedCount = proxies?.filter(p => p.status === 'failed').length ?? 0;
+
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
+    <div className="space-y-5 animate-fade-in">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-wsb-text">Proxies</h1>
-          {lastHealthCheck && (
-            <p className="text-sm text-wsb-text-secondary">
-              Last health check: {lastHealthCheck.toLocaleTimeString()}
-            </p>
-          )}
+          <h1 className="text-xl font-bold text-foreground">Proxies</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {proxies?.length ? (
+              <>
+                <span className="text-success">{workingCount} healthy</span>
+                {failedCount > 0 && <span className="text-destructive ml-2">{failedCount} failed</span>}
+                {lastHealthCheck && (
+                  <span className="ml-2">· Last check {lastHealthCheck.toLocaleTimeString()}</span>
+                )}
+              </>
+            ) : 'No proxies added'}
+          </p>
         </div>
-        
-        <div className="flex space-x-3">
+        <div className="flex items-center gap-2">
           <button
-            className="btn-secondary"
+            className="btn-secondary btn-sm gap-1.5"
             onClick={runHealthCheck}
             disabled={isHealthCheckRunning}
           >
-            {isHealthCheckRunning ? (
-              <LoadingSpinner size="sm" className="mr-2" />
-            ) : (
-              <ArrowPathIcon className="h-5 w-5 mr-2" />
-            )}
-            {isHealthCheckRunning ? 'Running Check...' : 'Run Health Check'}
+            <RefreshCw className={cn('w-3.5 h-3.5', isHealthCheckRunning && 'animate-spin')} />
+            {isHealthCheckRunning ? 'Checking...' : 'Health Check'}
           </button>
-          
-          <button
-            className="btn-secondary"
-            onClick={openProxyImporter}
-          >
-            Import Proxies
+          <button className="btn-secondary btn-sm gap-1.5" onClick={() => setIsImporterOpen(true)}>
+            <Upload className="w-3.5 h-3.5" />
+            Import
           </button>
-          
-          <button
-            className="btn-primary"
-            onClick={openProxyForm}
-          >
-            <PlusIcon className="h-5 w-5 mr-2" />
+          <button className="btn-primary text-xs gap-1.5" onClick={() => { setEditingProxy(null); setIsFormOpen(true); }}>
+            <Plus className="w-3.5 h-3.5" />
             Add Proxy
           </button>
         </div>
       </div>
-      
-      {proxies && proxies.length > 0 ? (
-        <ProxyList 
-          proxies={proxies}
-          onEdit={openProxyFormForEdit}
-        />
+
+      {proxies?.length ? (
+        <ProxyList proxies={proxies} onEdit={(proxy) => { setEditingProxy(proxy); setIsFormOpen(true); }} />
       ) : (
         <EmptyState
           title="No proxies yet"
           description="Add proxies to improve your success rate and avoid IP bans."
           actionText="Add Proxy"
-          onAction={openProxyForm}
+          onAction={() => { setEditingProxy(null); setIsFormOpen(true); }}
         />
       )}
-      
+
       {isFormOpen && (
-        <ProxyForm
-          isOpen={isFormOpen}
-          onClose={closeProxyForm}
-          proxy={editingProxy}
-        />
+        <ProxyForm isOpen={isFormOpen} onClose={() => { setIsFormOpen(false); setEditingProxy(null); }} proxy={editingProxy} />
       )}
-      
       {isImporterOpen && (
-        <ProxyImporter
-          isOpen={isImporterOpen}
-          onClose={closeProxyImporter}
-        />
+        <ProxyImporter isOpen={isImporterOpen} onClose={() => setIsImporterOpen(false)} />
       )}
     </div>
   );

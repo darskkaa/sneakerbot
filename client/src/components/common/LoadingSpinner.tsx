@@ -9,7 +9,7 @@ interface LoadingSpinnerProps {
 export default function LoadingSpinner({
   size = 'md',
   className = '',
-  color = 'text-wsb-primary'
+  color = 'text-primary'
 }: LoadingSpinnerProps) {
   const sizeClasses = {
     sm: 'h-4 w-4',

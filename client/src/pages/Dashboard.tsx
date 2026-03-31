@@ -1,173 +1,177 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  ClockIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  InformationCircleIcon,
-  PlusIcon
-} from '@heroicons/react/24/outline';
+import { useState } from 'react';
+import {
+  CheckCircle2,
+  XCircle,
+  Clock,
+  TrendingUp,
+  Plus,
+  Zap,
+  Activity,
+  ShoppingBag,
+  AlertTriangle,
+  Info
+} from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { LoadingSpinner, AccountGenerator } from '../components/common';
-import { supabase } from '../lib/supabaseClient';
-
-// Import ActivityLog type from AppContext to avoid conflicts
+import { cn } from '../lib/utils';
 import type { ActivityLog } from '../context/AppContext';
-
-interface DashboardStats {
-  totalCheckouts: number;
-  activeTasks: number;
-  successRate: number;
-  failedAttempts: number;
-}
 
 interface StatCardProps {
   title: string;
   value: string | number;
   icon: React.ReactNode;
+  trend?: string;
+  trendUp?: boolean;
+  accent?: string;
 }
 
-// StatCard component for displaying individual statistics
-const StatCard = ({ title, value, icon }: StatCardProps) => (
-  <div className="bg-dark-panel rounded-lg p-6 shadow">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm font-medium text-gray-400">{title}</p>
-        <p className="mt-1 text-2xl font-semibold text-white">{value}</p>
+const StatCard = ({ title, value, icon, trend, trendUp, accent = 'text-primary' }: StatCardProps) => (
+  <div className="stat-card group hover:border-border/80 transition-colors">
+    <div className="flex items-start justify-between">
+      <div className="space-y-1">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
+        <p className="text-2xl font-bold text-foreground tabular-nums">{value}</p>
       </div>
-      <div className="rounded-full bg-dark-panel p-3">
+      <div className={cn('p-2 rounded-lg bg-secondary', accent)}>
         {icon}
       </div>
     </div>
+    {trend && (
+      <p className={cn('text-xs font-medium', trendUp ? 'text-success' : 'text-muted-foreground')}>
+        {trend}
+      </p>
+    )}
   </div>
 );
 
-// ActivityItem component for displaying individual activity logs
-const ActivityItem = ({ activity }: { activity: ActivityLog }) => {
-  const getActivityIcon = () => {
-    switch (activity.type) {
-      case 'checkout_success':
-      case 'proxy_success':
-        return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
-      case 'checkout_failure':
-      case 'proxy_failed':
-        return <XCircleIcon className="h-5 w-5 text-red-500" />;
-      case 'warning':
-        return <InformationCircleIcon className="h-5 w-5 text-yellow-500" />;
-      default:
-        return <InformationCircleIcon className="h-5 w-5 text-blue-500" />;
-    }
-  };
-
-  return (
-    <div className="flex items-start space-x-3 p-4 hover:bg-dark-panel/50 rounded-lg transition-colors">
-      <div className="flex-shrink-0 mt-0.5">
-        {getActivityIcon()}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-white">{activity.content}</p>
-        {activity.details && (
-          <p className="text-sm text-gray-400 mt-1">{activity.details}</p>
-        )}
-        <p className="text-xs text-gray-500 mt-1">{activity.timestamp}</p>
-      </div>
-    </div>
-  );
+const getActivityIcon = (type: ActivityLog['type']) => {
+  switch (type) {
+    case 'checkout_success':
+    case 'proxy_success':
+      return <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />;
+    case 'checkout_failure':
+    case 'proxy_failed':
+      return <XCircle className="w-4 h-4 text-destructive flex-shrink-0" />;
+    case 'stock_detected':
+      return <Zap className="w-4 h-4 text-warning flex-shrink-0" />;
+    case 'warning':
+      return <AlertTriangle className="w-4 h-4 text-warning flex-shrink-0" />;
+    default:
+      return <Info className="w-4 h-4 text-primary flex-shrink-0" />;
+  }
 };
+
+const ActivityItem = ({ activity }: { activity: ActivityLog }) => (
+  <div className="flex items-start gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors">
+    <div className="mt-0.5">{getActivityIcon(activity.type)}</div>
+    <div className="flex-1 min-w-0">
+      <p className="text-sm text-foreground leading-snug">{activity.content}</p>
+      {activity.details && (
+        <p className="text-xs text-muted-foreground mt-0.5 truncate">{activity.details}</p>
+      )}
+    </div>
+    <span className="text-[10px] text-muted-foreground whitespace-nowrap mt-0.5 flex-shrink-0">
+      {activity.timestamp}
+    </span>
+  </div>
+);
 
 export default function Dashboard() {
   const { stats, activities, loading } = useAppContext();
-  const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('day');
   const [showAccountGenerator, setShowAccountGenerator] = useState(false);
-  
 
-  
   if (loading.stats || loading.activities) {
     return (
-      <div className="flex justify-center py-20">
+      <div className="flex items-center justify-center py-24">
         <LoadingSpinner size="lg" />
       </div>
     );
   }
 
-  const handleAccountGenerated = (accountData: any) => {
-    console.log('Account generated successfully:', accountData);
-    // You can add the account to your context or perform other actions here
-  };
-
-  // Prepare dashboard stats for display
-  const dashboardStats = [
+  const dashboardStats: StatCardProps[] = [
     {
       title: 'Total Checkouts',
-      value: stats?.totalCheckouts || 0,
-      icon: <CheckCircleIcon className="h-6 w-6 text-green-500" />
+      value: stats?.totalCheckouts ?? 0,
+      icon: <ShoppingBag className="w-5 h-5" />,
+      accent: 'text-success',
+      trend: 'All time',
     },
     {
       title: 'Success Rate',
-      value: `${stats?.successRate || 0}%`,
-      icon: <InformationCircleIcon className="h-6 w-6 text-blue-500" />
+      value: `${stats?.successRate ?? 0}%`,
+      icon: <TrendingUp className="w-5 h-5" />,
+      accent: 'text-primary',
+      trend: stats?.successRate && stats.successRate > 60 ? 'Above average' : 'Session',
+      trendUp: (stats?.successRate ?? 0) > 60,
     },
     {
       title: 'Active Tasks',
-      value: stats?.activeTasks || 0,
-      icon: <ClockIcon className="h-6 w-6 text-yellow-500" />
+      value: stats?.activeTasks ?? 0,
+      icon: <Activity className="w-5 h-5" />,
+      accent: 'text-warning',
+      trend: stats?.activeTasks && stats.activeTasks > 0 ? 'Currently running' : 'No active tasks',
     },
     {
-      title: 'Failed Attempts',
-      value: stats?.failedAttempts || 0,
-      icon: <XCircleIcon className="h-6 w-6 text-red-500" />
-    }
+      title: 'Failed',
+      value: stats?.failedAttempts ?? 0,
+      icon: <XCircle className="w-5 h-5" />,
+      accent: 'text-destructive',
+      trend: 'All time',
+    },
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Monitor your bot performance</p>
+        </div>
         <button
           onClick={() => setShowAccountGenerator(true)}
-          className="btn-primary flex items-center space-x-2"
+          className="btn-primary text-xs gap-1.5"
         >
-          <PlusIcon className="h-4 w-4" />
-          <span>Generate Account</span>
+          <Plus className="w-3.5 h-3.5" />
+          Generate Account
         </button>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {dashboardStats.map((stat, index) => (
-          <StatCard
-            key={index}
-            title={stat.title}
-            value={stat.value}
-            icon={stat.icon}
-          />
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {dashboardStats.map((stat, i) => (
+          <StatCard key={i} {...stat} />
         ))}
       </div>
 
-      {/* Recent Activities */}
-      <div className="mt-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-medium text-white">Recent Activities</h2>
-        </div>
-        <div className="mt-4 overflow-hidden bg-dark-panel rounded-lg shadow">
-          <div className="divide-y divide-gray-700">
-            {activities.length > 0 ? (
-              activities.map((activity) => (
-                <ActivityItem key={activity.id} activity={activity} />
-              ))
-            ) : (
-              <div className="p-6 text-center text-gray-400">
-                No activities found
-              </div>
-            )}
+      {/* Activity Feed */}
+      <div className="card overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-muted-foreground" />
+            <h2 className="text-sm font-semibold text-foreground">Recent Activity</h2>
           </div>
+          <span className="text-xs text-muted-foreground">{activities.length} events</span>
+        </div>
+        <div className="divide-y divide-border/50 max-h-[420px] overflow-y-auto">
+          {activities.length > 0 ? (
+            activities.map((activity) => (
+              <ActivityItem key={activity.id} activity={activity} />
+            ))
+          ) : (
+            <div className="px-4 py-12 text-center">
+              <Activity className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">No activity yet</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Start a task to see activity here</p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Account Generator Modal */}
       <AccountGenerator
         isOpen={showAccountGenerator}
         onClose={() => setShowAccountGenerator(false)}
-        onSuccess={handleAccountGenerated}
+        onSuccess={(data: any) => console.log('Account generated:', data)}
       />
     </div>
   );

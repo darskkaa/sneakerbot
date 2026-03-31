@@ -1,136 +1,138 @@
 import { useState } from 'react';
-import { PlusIcon, PencilIcon, TrashIcon, IdentificationIcon } from '@heroicons/react/24/outline';
+import { Plus, Pencil, Trash2, CreditCard, MapPin, User } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import ProfileForm from '../components/profiles/ProfileForm';
 import EmptyState from '../components/common/EmptyState';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import { IdentificationIcon } from '@heroicons/react/24/outline';
+import { cn } from '../lib/utils';
 
 export default function Profiles() {
   const { profiles, loading, deleteProfile } = useAppContext();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProfile, setEditingProfile] = useState<any>(null);
-  
+
   const openNewProfileForm = () => {
     setEditingProfile(null);
     setIsFormOpen(true);
   };
-  
+
   const openEditProfileForm = (profile: any) => {
     setEditingProfile(profile);
     setIsFormOpen(true);
   };
-  
+
   const closeForm = () => {
     setIsFormOpen(false);
     setEditingProfile(null);
   };
 
   const handleDeleteProfile = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this profile?')) {
-      try {
-        await deleteProfile(id);
-      } catch (error) {
-        console.error('Error deleting profile:', error);
-      }
+    if (window.confirm('Delete this profile?')) {
+      await deleteProfile(id).catch(console.error);
     }
   };
 
-  // Mask sensitive data for display
-  const maskCardNumber = (cardNumber: string) => {
-    if (!cardNumber) return '';
-    return '*'.repeat(cardNumber.length - 4) + cardNumber.slice(-4);
+  const maskCard = (cardNumber: string) => {
+    if (!cardNumber) return '—';
+    return `•••• •••• •••• ${cardNumber.slice(-4)}`;
   };
-  
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-wsb-text">Profiles</h1>
-        <button 
-          onClick={openNewProfileForm}
-          className="btn-primary"
-        >
-          <PlusIcon className="h-5 w-5 mr-2" />
+    <div className="space-y-5 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-foreground">Profiles</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Shipping and payment profiles</p>
+        </div>
+        <button onClick={openNewProfileForm} className="btn-primary text-xs gap-1.5">
+          <Plus className="w-3.5 h-3.5" />
           New Profile
         </button>
       </div>
-      
+
       {loading.profiles ? (
-        <div className="flex justify-center py-20">
+        <div className="flex items-center justify-center py-24">
           <LoadingSpinner size="lg" />
         </div>
       ) : profiles.length === 0 ? (
-        <EmptyState 
+        <EmptyState
           title="No profiles yet"
-          description="Create a profile with your shipping and payment information to use during checkout."
+          description="Create a profile with your shipping and payment information."
           actionText="Create Profile"
           onAction={openNewProfileForm}
           icon={IdentificationIcon}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {profiles.map((profile) => (
-            <div key={profile.id} className="card hover:bg-gray-800 transition-colors">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-medium text-wsb-text">{profile.name}</h3>
-                <div className="flex space-x-2">
-                  <button 
+            <div key={profile.id} className="card p-4 space-y-3 hover:border-border/80 transition-colors">
+              {/* Header */}
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <User className="w-4 h-4 text-primary" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-foreground">{profile.name}</h3>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
                     onClick={() => openEditProfileForm(profile)}
-                    className="text-wsb-text-secondary hover:text-wsb-primary"
-                    aria-label="Edit profile"
+                    className="btn-icon text-muted-foreground hover:text-foreground"
+                    aria-label="Edit"
                   >
-                    <PencilIcon className="h-5 w-5" />
+                    <Pencil className="w-3.5 h-3.5" />
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleDeleteProfile(profile.id)}
-                    className="text-wsb-text-secondary hover:text-wsb-error"
-                    aria-label="Delete profile"
+                    className="btn-icon text-muted-foreground hover:text-destructive"
+                    aria-label="Delete"
                   >
-                    <TrashIcon className="h-5 w-5" />
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
-              
-              <div className="grid grid-cols-1 gap-3">
-                {/* Shipping Information */}
-                <div className="p-3 bg-gray-800 rounded-lg">
-                  <h4 className="text-sm font-medium text-wsb-text-secondary mb-2">Shipping</h4>
-                  <p className="text-wsb-text">
-                    {profile.shippingInfo.firstName} {profile.shippingInfo.lastName}
-                  </p>
-                  <p className="text-wsb-text">{profile.shippingInfo.email}</p>
-                  <p className="text-wsb-text">{profile.shippingInfo.address1}</p>
-                  {profile.shippingInfo.address2 && (
-                    <p className="text-wsb-text">{profile.shippingInfo.address2}</p>
-                  )}
-                  <p className="text-wsb-text">
-                    {profile.shippingInfo.city}, {profile.shippingInfo.state} {profile.shippingInfo.zipCode}
-                  </p>
-                  <p className="text-wsb-text">{profile.shippingInfo.country}</p>
+
+              {/* Shipping */}
+              <div className="rounded-md bg-secondary/50 p-3 space-y-1">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Shipping</span>
                 </div>
-                
-                {/* Payment Information */}
-                <div className="p-3 bg-gray-800 rounded-lg">
-                  <h4 className="text-sm font-medium text-wsb-text-secondary mb-2">Payment</h4>
-                  <p className="text-wsb-text">{profile.billingInfo.cardholderName}</p>
-                  <p className="text-wsb-text">
-                    {maskCardNumber(profile.billingInfo.cardNumber)}
-                  </p>
-                  <p className="text-wsb-text">
-                    Expires: {profile.billingInfo.expiryMonth}/{profile.billingInfo.expiryYear}
-                  </p>
+                <p className="text-xs text-foreground font-medium">
+                  {profile.shippingInfo.firstName} {profile.shippingInfo.lastName}
+                </p>
+                <p className="text-xs text-muted-foreground">{profile.shippingInfo.email}</p>
+                <p className="text-xs text-muted-foreground">
+                  {profile.shippingInfo.address1}
+                  {profile.shippingInfo.address2 && `, ${profile.shippingInfo.address2}`}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {profile.shippingInfo.city}, {profile.shippingInfo.state} {profile.shippingInfo.zipCode}
+                </p>
+              </div>
+
+              {/* Payment */}
+              <div className="rounded-md bg-secondary/50 p-3 space-y-1">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Payment</span>
                 </div>
+                <p className="text-xs text-foreground font-medium">{profile.billingInfo.cardholderName}</p>
+                <p className="text-xs font-mono text-muted-foreground">
+                  {maskCard(profile.billingInfo.cardNumber)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Exp {profile.billingInfo.expiryMonth}/{profile.billingInfo.expiryYear}
+                </p>
               </div>
             </div>
           ))}
         </div>
       )}
-      
+
       {isFormOpen && (
-        <ProfileForm 
-          isOpen={isFormOpen} 
-          onClose={closeForm} 
-          profile={editingProfile}
-        />
+        <ProfileForm isOpen={isFormOpen} onClose={closeForm} profile={editingProfile} />
       )}
     </div>
   );
