@@ -211,15 +211,15 @@ export default function ProxyImporter({ isOpen, onClose }: ProxyImporterProps) {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-2xl transform rounded-lg bg-wsb-dark-panel p-6 shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-2xl transform rounded-lg glass-elevated p-6 shadow-xl transition-all">
                 <div className="flex items-center justify-between mb-4">
-                  <Dialog.Title className="text-lg font-medium text-wsb-text">
+                  <Dialog.Title className="text-lg font-medium text-foreground">
                     Import Proxies
                   </Dialog.Title>
                   <button
                     type="button"
                     onClick={onClose}
-                    className="rounded-full p-1 text-wsb-text-secondary hover:bg-gray-800 hover:text-wsb-text"
+                    className="rounded-full p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
                   >
                     <XMarkIcon className="h-5 w-5" />
                   </button>
@@ -227,7 +227,7 @@ export default function ProxyImporter({ isOpen, onClose }: ProxyImporterProps) {
                 
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="groupName" className="block text-sm font-medium text-wsb-text mb-1">
+                    <label htmlFor="groupName" className="block text-sm font-medium text-foreground mb-1">
                       Group Name
                     </label>
                     <input
@@ -241,7 +241,7 @@ export default function ProxyImporter({ isOpen, onClose }: ProxyImporterProps) {
                   </div>
                   
                   <div>
-                    <label htmlFor="proxyType" className="block text-sm font-medium text-wsb-text mb-1">
+                    <label htmlFor="proxyType" className="block text-sm font-medium text-foreground mb-1">
                       Proxy Type
                     </label>
                     <select
@@ -259,14 +259,14 @@ export default function ProxyImporter({ isOpen, onClose }: ProxyImporterProps) {
                   
                   <div>
                     <div className="flex justify-between items-center mb-1">
-                      <label htmlFor="proxyList" className="block text-sm font-medium text-wsb-text">
+                      <label htmlFor="proxyList" className="block text-sm font-medium text-foreground">
                         Proxy List
                       </label>
                       <div className="flex space-x-2">
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
-                          className="inline-flex items-center px-2 py-1 text-xs rounded-md bg-gray-800 text-wsb-text-secondary hover:text-wsb-text"
+                          className="inline-flex items-center px-2 py-1 text-xs rounded-md bg-secondary text-muted-foreground hover:text-foreground"
                         >
                           <ArrowUpTrayIcon className="h-3 w-3 mr-1" />
                           Upload
@@ -281,7 +281,7 @@ export default function ProxyImporter({ isOpen, onClose }: ProxyImporterProps) {
                         <button
                           type="button"
                           onClick={handlePasteFromClipboard}
-                          className="inline-flex items-center px-2 py-1 text-xs rounded-md bg-gray-800 text-wsb-text-secondary hover:text-wsb-text"
+                          className="inline-flex items-center px-2 py-1 text-xs rounded-md bg-secondary text-muted-foreground hover:text-foreground"
                         >
                           <ClipboardIcon className="h-3 w-3 mr-1" />
                           Paste
@@ -289,7 +289,7 @@ export default function ProxyImporter({ isOpen, onClose }: ProxyImporterProps) {
                         <button
                           type="button"
                           onClick={handleClear}
-                          className="inline-flex items-center px-2 py-1 text-xs rounded-md bg-gray-800 text-wsb-text-secondary hover:text-wsb-text"
+                          className="inline-flex items-center px-2 py-1 text-xs rounded-md bg-secondary text-muted-foreground hover:text-foreground"
                         >
                           Clear
                         </button>
@@ -303,7 +303,7 @@ export default function ProxyImporter({ isOpen, onClose }: ProxyImporterProps) {
                       placeholder="Enter proxies one per line in formats:&#10;ip:port&#10;ip:port:username:password&#10;username:password@ip:port"
                       className="form-input font-mono text-sm"
                     />
-                    <p className="text-xs text-wsb-text-secondary mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {proxyText.split('\n').filter(line => line.trim()).length} proxies entered
                     </p>
                   </div>
@@ -312,11 +312,11 @@ export default function ProxyImporter({ isOpen, onClose }: ProxyImporterProps) {
                     <div>
                       {importStats.total > 0 && (
                         <div className="text-sm">
-                          <span className="text-wsb-text-secondary">Imported: </span>
-                          <span className="text-wsb-success">{importStats.successful}</span>
-                          <span className="text-wsb-text-secondary"> / Failed: </span>
-                          <span className="text-wsb-error">{importStats.failed}</span>
-                          <span className="text-wsb-text-secondary"> / Total: </span>
+                          <span className="text-muted-foreground">Imported: </span>
+                          <span className="text-success">{importStats.successful}</span>
+                          <span className="text-muted-foreground"> / Failed: </span>
+                          <span className="text-destructive">{importStats.failed}</span>
+                          <span className="text-muted-foreground"> / Total: </span>
                           <span>{importStats.total}</span>
                         </div>
                       )}

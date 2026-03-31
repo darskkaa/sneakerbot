@@ -266,21 +266,21 @@ export default function ProductMonitor({
     switch (stockStatus) {
       case 'in-stock':
         return (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-wsb-success bg-opacity-10 text-wsb-success">
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium badge-success">
             <ShoppingBagIcon className="h-3 w-3 mr-1" />
             In Stock
           </span>
         );
       case 'out-of-stock':
         return (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-wsb-error bg-opacity-10 text-wsb-error">
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium badge-error">
             <ExclamationTriangleIcon className="h-3 w-3 mr-1" />
             Out of Stock
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-wsb-text-secondary">
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium badge-idle">
             <ClockIcon className="h-3 w-3 mr-1" />
             Unknown
           </span>
@@ -292,8 +292,8 @@ export default function ProductMonitor({
     <div className="card">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-lg font-medium text-wsb-text">Product Monitor</h3>
-          <p className="text-sm text-wsb-text-secondary">
+          <h3 className="text-lg font-medium text-foreground">Product Monitor</h3>
+          <p className="text-sm text-muted-foreground">
             {site}: {sku}
           </p>
         </div>
@@ -308,31 +308,31 @@ export default function ProductMonitor({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-wsb-text">Status:</span>
+            <span className="text-sm font-medium text-foreground">Status:</span>
             {getStatusBadge()}
           </div>
           
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-wsb-text">Last Checked:</span>
-            <span className="text-sm text-wsb-text-secondary">
+            <span className="text-sm font-medium text-foreground">Last Checked:</span>
+            <span className="text-sm text-muted-foreground">
               {lastChecked ? lastChecked.toLocaleTimeString() : 'Never'}
             </span>
           </div>
           
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-wsb-text">Check Count:</span>
-            <span className="text-sm text-wsb-text-secondary">{checkCount}</span>
+            <span className="text-sm font-medium text-foreground">Check Count:</span>
+            <span className="text-sm text-muted-foreground">{checkCount}</span>
           </div>
           
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-wsb-text">Current Interval:</span>
-            <span className="text-sm text-wsb-text-secondary">
+            <span className="text-sm font-medium text-foreground">Current Interval:</span>
+            <span className="text-sm text-muted-foreground">
               {getIntervalText(currentInterval)}
             </span>
           </div>
           
           {error && (
-            <div className="mt-2 p-2 rounded bg-wsb-error bg-opacity-10 text-wsb-error text-sm">
+            <div className="mt-2 p-2 rounded bg-destructive/10 text-destructive text-sm">
               {error}
             </div>
           )}
@@ -341,7 +341,7 @@ export default function ProductMonitor({
         <div>
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
-              <label htmlFor="polling-interval" className="text-sm font-medium text-wsb-text">
+              <label htmlFor="polling-interval" className="text-sm font-medium text-foreground">
                 Polling Interval: {getIntervalText(baseInterval)}
               </label>
             </div>
@@ -360,9 +360,9 @@ export default function ProductMonitor({
                 min={minInterval}
                 max={maxInterval}
                 step={50}
-                className="w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer"
+                className="w-full h-1 bg-secondary rounded-full appearance-none cursor-pointer"
               />
-              <div className="flex justify-between text-xs text-wsb-text-secondary mt-1">
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
                 <span>Fast ({getIntervalText(minInterval)})</span>
                 <span>Slow ({getIntervalText(maxInterval)})</span>
               </div>
@@ -370,7 +370,7 @@ export default function ProductMonitor({
           </div>
           
           <div className="flex items-center justify-between mb-2">
-            <label htmlFor="backoff-toggle" className="text-sm font-medium text-wsb-text">
+            <label htmlFor="backoff-toggle" className="text-sm font-medium text-foreground">
               Exponential Backoff
             </label>
             <div className="relative inline-block h-6 w-11">
@@ -382,7 +382,7 @@ export default function ProductMonitor({
                 className="opacity-0 w-0 h-0"
               />
               <span 
-                className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-colors ${backoffEnabled ? 'bg-wsb-primary' : 'bg-gray-700'}`}
+                className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-colors ${backoffEnabled ? 'bg-primary' : 'bg-secondary'}`}
               >
                 <span 
                   className={`absolute h-4 w-4 top-1 bg-white rounded-full transition-transform ${backoffEnabled ? 'left-6' : 'left-1'}`}
@@ -391,16 +391,16 @@ export default function ProductMonitor({
             </div>
           </div>
           
-          <p className="text-xs text-wsb-text-secondary">
+          <p className="text-xs text-muted-foreground">
             When enabled, the monitor will automatically slow down when the product is out of stock, and speed up when it's in stock.
           </p>
         </div>
       </div>
       
-      <div className="p-3 bg-gray-800 rounded-lg mt-4">
+      <div className="p-3 bg-secondary rounded-lg mt-4">
         <div className="flex items-start">
-          <BoltIcon className="h-5 w-5 text-wsb-primary mr-2 flex-shrink-0" />
-          <p className="text-sm text-wsb-text-secondary">
+          <BoltIcon className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+          <p className="text-sm text-muted-foreground">
             {autoCheckout
               ? "Auto-checkout is enabled. When stock is detected, checkout will start automatically."
               : "Auto-checkout is disabled. You'll be notified when stock is detected."

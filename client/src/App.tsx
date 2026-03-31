@@ -52,23 +52,31 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 }
 
 const MESH_GRADIENT =
-  'radial-gradient(ellipse 55% 40% at 12% 18%, rgba(99,102,241,0.14) 0%, transparent 70%),' +
-  'radial-gradient(ellipse 45% 45% at 88% 80%, rgba(16,185,129,0.09) 0%, transparent 70%),' +
-  'radial-gradient(ellipse 38% 32% at 72% 8%,  rgba(245,158,11,0.07)  0%, transparent 60%),' +
-  'radial-gradient(ellipse 40% 35% at 30% 90%, rgba(99,102,241,0.06)  0%, transparent 60%)';
+  'radial-gradient(ellipse 60% 45% at 10% 15%, rgba(99,102,241,0.18) 0%, transparent 65%),' +
+  'radial-gradient(ellipse 50% 50% at 90% 85%, rgba(16,185,129,0.12) 0%, transparent 65%),' +
+  'radial-gradient(ellipse 40% 35% at 75% 10%, rgba(139,92,246,0.10) 0%, transparent 55%),' +
+  'radial-gradient(ellipse 45% 40% at 25% 90%, rgba(99,102,241,0.08) 0%, transparent 55%),' +
+  'radial-gradient(ellipse 30% 30% at 50% 50%, rgba(99,102,241,0.04) 0%, transparent 60%)';
+
+/** Shared animated background layer — gradient + particles */
+function AnimatedBackground() {
+  return (
+    <>
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: MESH_GRADIENT, zIndex: 0 }}
+      />
+      <ParticlesWaves />
+    </>
+  );
+}
 
 function AuthLayout() {
   return (
-    <div className="h-screen overflow-hidden relative" style={{ backgroundColor: '#060b16' }}>
-      {/* Static ambient gradient */}
-      <div
-        aria-hidden="true"
-        style={{ position: 'absolute', inset: 0, background: MESH_GRADIENT, zIndex: 0, pointerEvents: 'none' }}
-      />
-      {/* Animated particle waves */}
-      <ParticlesWaves />
-      {/* All app content — sits above particles */}
-      <div className="flex h-full w-full" style={{ position: 'relative', zIndex: 2 }}>
+    <div className="h-screen overflow-hidden relative" style={{ backgroundColor: '#030712' }}>
+      <AnimatedBackground />
+      <div className="flex h-full w-full relative" style={{ zIndex: 2 }}>
         <Sidebar />
         <main className="flex-1 overflow-y-auto">
           <div className="p-6 max-w-[1400px] mx-auto">
@@ -115,12 +123,12 @@ function App() {
             theme="dark"
             toastOptions={{
               style: {
-                background: 'rgba(255,255,255,0.07)',
-                backdropFilter: 'blur(24px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                background: 'rgba(12,18,35,0.85)',
+                backdropFilter: 'blur(40px) saturate(200%)',
+                WebkitBackdropFilter: 'blur(40px) saturate(200%)',
                 border: '1px solid rgba(255,255,255,0.12)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-                color: 'hsl(210, 40%, 98%)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 80px -20px rgba(99,102,241,0.10)',
+                color: '#f8fafc',
               },
             }}
           />

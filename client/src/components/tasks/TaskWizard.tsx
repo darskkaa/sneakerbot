@@ -205,9 +205,9 @@ export default function TaskWizard({ isOpen, onClose, onTaskCreated }: TaskWizar
               <ErrorMessage name="proxyId" component="div" className="form-error" />
             </div>
             
-            <div className="p-4 bg-gray-800 rounded-lg flex items-start">
-              <InformationCircleIcon className="h-5 w-5 text-wsb-primary mr-2 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-wsb-text-secondary">
+            <div className="p-4 glass rounded-xl flex items-start">
+              <InformationCircleIcon className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-muted-foreground">
                 Using proxies is recommended to avoid IP bans and increase your chances of success.
                 For high-demand releases, we recommend using residential proxies.
               </p>
@@ -220,8 +220,8 @@ export default function TaskWizard({ isOpen, onClose, onTaskCreated }: TaskWizar
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-wsb-text font-medium">Product Monitor</h3>
-                <p className="text-wsb-text-secondary text-sm">
+                <h3 className="text-foreground font-medium">Product Monitor</h3>
+                <p className="text-muted-foreground text-sm">
                   Automatically monitor for restocks
                 </p>
               </div>
@@ -235,8 +235,8 @@ export default function TaskWizard({ isOpen, onClose, onTaskCreated }: TaskWizar
             
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-wsb-text font-medium">Auto CAPTCHA Solver</h3>
-                <p className="text-wsb-text-secondary text-sm">
+                <h3 className="text-foreground font-medium">Auto CAPTCHA Solver</h3>
+                <p className="text-muted-foreground text-sm">
                   Use configured CAPTCHA solver service
                 </p>
               </div>
@@ -305,43 +305,43 @@ export default function TaskWizard({ isOpen, onClose, onTaskCreated }: TaskWizar
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-wsb-text font-medium mb-2">Product Details</h3>
+              <h3 className="text-foreground font-medium mb-2">Product Details</h3>
               <div className="card space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-wsb-text-secondary">Site:</span>
-                  <span className="text-wsb-text font-medium">
+                  <span className="text-muted-foreground">Site:</span>
+                  <span className="text-foreground font-medium">
                     {sites.find(s => s.id === values.site)?.name || values.site}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wsb-text-secondary">Product:</span>
-                  <span className="text-wsb-text font-medium truncate max-w-xs">
+                  <span className="text-muted-foreground">Product:</span>
+                  <span className="text-foreground font-medium truncate max-w-xs">
                     {values.productUrl}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wsb-text-secondary">Size:</span>
-                  <span className="text-wsb-text font-medium">{values.size}</span>
+                  <span className="text-muted-foreground">Size:</span>
+                  <span className="text-foreground font-medium">{values.size}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wsb-text-secondary">Quantity:</span>
-                  <span className="text-wsb-text font-medium">{values.quantity}</span>
+                  <span className="text-muted-foreground">Quantity:</span>
+                  <span className="text-foreground font-medium">{values.quantity}</span>
                 </div>
               </div>
             </div>
             
             <div>
-              <h3 className="text-wsb-text font-medium mb-2">Account Settings</h3>
+              <h3 className="text-foreground font-medium mb-2">Account Settings</h3>
               <div className="card space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-wsb-text-secondary">Profile:</span>
-                  <span className="text-wsb-text font-medium">
+                  <span className="text-muted-foreground">Profile:</span>
+                  <span className="text-foreground font-medium">
                     {profiles.find(p => p.id === values.profileId)?.name || 'None'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wsb-text-secondary">Proxy Group:</span>
-                  <span className="text-wsb-text font-medium">
+                  <span className="text-muted-foreground">Proxy Group:</span>
+                  <span className="text-foreground font-medium">
                     {proxies.find(p => p.id === values.proxyId)?.name || 'None'}
                   </span>
                 </div>
@@ -349,31 +349,31 @@ export default function TaskWizard({ isOpen, onClose, onTaskCreated }: TaskWizar
             </div>
             
             <div>
-              <h3 className="text-wsb-text font-medium mb-2">Advanced Settings</h3>
+              <h3 className="text-foreground font-medium mb-2">Advanced Settings</h3>
               <div className="card space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-wsb-text-secondary">Product Monitor:</span>
-                  <span className="text-wsb-text font-medium">
+                  <span className="text-muted-foreground">Product Monitor:</span>
+                  <span className="text-foreground font-medium">
                     {values.useProductMonitor ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wsb-text-secondary">Auto CAPTCHA Solver:</span>
-                  <span className="text-wsb-text font-medium">
+                  <span className="text-muted-foreground">Auto CAPTCHA Solver:</span>
+                  <span className="text-foreground font-medium">
                     {values.useAutoSolver ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wsb-text-secondary">Monitor Delay:</span>
-                  <span className="text-wsb-text font-medium">{values.monitorDelay} ms</span>
+                  <span className="text-muted-foreground">Monitor Delay:</span>
+                  <span className="text-foreground font-medium">{values.monitorDelay} ms</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wsb-text-secondary">Retry Delay:</span>
-                  <span className="text-wsb-text font-medium">{values.retryDelay} ms</span>
+                  <span className="text-muted-foreground">Retry Delay:</span>
+                  <span className="text-foreground font-medium">{values.retryDelay} ms</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wsb-text-secondary">Retry Limit:</span>
-                  <span className="text-wsb-text font-medium">{values.retryLimit}</span>
+                  <span className="text-muted-foreground">Retry Limit:</span>
+                  <span className="text-foreground font-medium">{values.retryLimit}</span>
                 </div>
               </div>
             </div>
@@ -411,7 +411,7 @@ export default function TaskWizard({ isOpen, onClose, onTaskCreated }: TaskWizar
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-50" />
+          <div className="fixed inset-0 dialog-backdrop" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -425,9 +425,9 @@ export default function TaskWizard({ isOpen, onClose, onTaskCreated }: TaskWizar
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform rounded-lg bg-gray-900 p-6 shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-md transform glass-elevated p-6 transition-all">
                 <div className="flex items-center justify-between mb-4">
-                  <Dialog.Title className="text-lg font-medium text-wsb-text">
+                  <Dialog.Title className="text-lg font-medium text-foreground">
                     {step === 1 && 'Product Details'}
                     {step === 2 && 'Account Settings'}
                     {step === 3 && 'Advanced Settings'}
@@ -436,7 +436,7 @@ export default function TaskWizard({ isOpen, onClose, onTaskCreated }: TaskWizar
                   <button
                     type="button"
                     onClick={onClose}
-                    className="rounded-full p-1 text-wsb-text-secondary hover:bg-gray-800 hover:text-wsb-text"
+                    className="rounded-full p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
                   >
                     <XMarkIcon className="h-5 w-5" />
                   </button>
@@ -448,7 +448,7 @@ export default function TaskWizard({ isOpen, onClose, onTaskCreated }: TaskWizar
                     <div key={s} className="flex-1 flex items-center">
                       <div
                         className={`h-2 flex-grow ${
-                          s < step ? 'bg-wsb-primary' : s === step ? 'bg-wsb-primary opacity-50' : 'bg-gray-700'
+                          s < step ? 'bg-primary' : s === step ? 'bg-primary opacity-50' : 'bg-secondary'
                         } ${s === 1 ? 'rounded-l' : ''} ${s === 4 ? 'rounded-r' : ''}`}
                       ></div>
                     </div>
@@ -466,7 +466,7 @@ export default function TaskWizard({ isOpen, onClose, onTaskCreated }: TaskWizar
                     <Form className="space-y-6">
                       {renderStepContent(values, errors, touched)}
                       
-                      <div className="flex justify-between pt-4 border-t border-gray-700">
+                      <div className="flex justify-between pt-4 border-t border-[rgba(255,255,255,0.08)]">
                         {step > 1 ? (
                           <button
                             type="button"
