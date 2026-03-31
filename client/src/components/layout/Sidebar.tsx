@@ -33,7 +33,7 @@ export default function Sidebar() {
     <aside className="flex flex-col w-[220px] min-w-[220px] glass-sidebar">
       {/* Logo */}
       <div className="flex items-center gap-2.5 h-14 px-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-        <div className="flex items-center justify-center w-7 h-7 rounded-md bg-primary">
+        <div className="flex items-center justify-center w-7 h-7 rounded-lg" style={{ background: 'linear-gradient(135deg, hsl(239 84% 67%) 0%, hsl(260 80% 60%) 100%)', boxShadow: '0 0 16px rgba(99,102,241,0.40)' }}>
           <Zap className="w-4 h-4 text-white" fill="white" />
         </div>
         <span className="text-sm font-bold text-foreground tracking-tight">SneakerBot</span>
@@ -54,8 +54,8 @@ export default function Sidebar() {
               cn(
                 'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all duration-150 group',
                 isActive
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                  ? 'bg-primary/10 text-primary border border-primary/20'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.05]'
               )
             }
           >

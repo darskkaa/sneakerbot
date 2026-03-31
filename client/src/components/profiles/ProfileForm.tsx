@@ -116,7 +116,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-50" />
+          <div className="fixed inset-0 dialog-backdrop" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -130,14 +130,14 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-2xl transform rounded-2xl bg-wsb-dark-panel p-6 shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-2xl transform glass-elevated p-6 transition-all">
                 <div className="flex items-center justify-between mb-6">
-                  <Dialog.Title className="text-lg font-medium text-wsb-text">
+                  <Dialog.Title className="text-lg font-medium text-foreground">
                     {isEditing ? 'Edit Profile' : 'Create New Profile'}
                   </Dialog.Title>
                   <button
                     type="button"
-                    className="text-wsb-text-secondary hover:text-wsb-text"
+                    className="text-muted-foreground hover:text-foreground"
                     onClick={onClose}
                   >
                     <XMarkIcon className="h-6 w-6" />
@@ -161,18 +161,18 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                           placeholder="e.g., Home Address"
                           className="form-input"
                         />
-                        <ErrorMessage name="name" component="div" className="mt-1 text-sm text-wsb-error" />
+                        <ErrorMessage name="name" component="div" className="mt-1 text-sm text-destructive" />
                       </div>
 
                       {/* Tabs for Shipping and Billing */}
-                      <div className="border-b border-gray-700">
+                      <div className="border-b border-[rgba(255,255,255,0.08)]">
                         <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                           <button
                             type="button"
                             className={`py-2 px-1 border-b-2 font-medium text-sm ${
                               activeTab === 'shipping'
-                                ? 'border-wsb-primary text-wsb-primary'
-                                : 'border-transparent text-wsb-text-secondary hover:text-wsb-text hover:border-gray-700'
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-[rgba(255,255,255,0.12)]'
                             }`}
                             onClick={() => setActiveTab('shipping')}
                           >
@@ -182,8 +182,8 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                             type="button"
                             className={`py-2 px-1 border-b-2 font-medium text-sm ${
                               activeTab === 'billing'
-                                ? 'border-wsb-primary text-wsb-primary'
-                                : 'border-transparent text-wsb-text-secondary hover:text-wsb-text hover:border-gray-700'
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-[rgba(255,255,255,0.12)]'
                             }`}
                             onClick={() => setActiveTab('billing')}
                           >
@@ -204,7 +204,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                                 name="shippingInfo.firstName"
                                 className="form-input"
                               />
-                              <ErrorMessage name="shippingInfo.firstName" component="div" className="mt-1 text-sm text-wsb-error" />
+                              <ErrorMessage name="shippingInfo.firstName" component="div" className="mt-1 text-sm text-destructive" />
                             </div>
                             <div>
                               <label htmlFor="shippingInfo.lastName" className="form-label">Last Name</label>
@@ -214,7 +214,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                                 name="shippingInfo.lastName"
                                 className="form-input"
                               />
-                              <ErrorMessage name="shippingInfo.lastName" component="div" className="mt-1 text-sm text-wsb-error" />
+                              <ErrorMessage name="shippingInfo.lastName" component="div" className="mt-1 text-sm text-destructive" />
                             </div>
                           </div>
 
@@ -227,7 +227,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                                 name="shippingInfo.email"
                                 className="form-input"
                               />
-                              <ErrorMessage name="shippingInfo.email" component="div" className="mt-1 text-sm text-wsb-error" />
+                              <ErrorMessage name="shippingInfo.email" component="div" className="mt-1 text-sm text-destructive" />
                             </div>
                             <div>
                               <label htmlFor="shippingInfo.phone" className="form-label">Phone</label>
@@ -237,7 +237,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                                 name="shippingInfo.phone"
                                 className="form-input"
                               />
-                              <ErrorMessage name="shippingInfo.phone" component="div" className="mt-1 text-sm text-wsb-error" />
+                              <ErrorMessage name="shippingInfo.phone" component="div" className="mt-1 text-sm text-destructive" />
                             </div>
                           </div>
 
@@ -249,12 +249,12 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                               name="shippingInfo.address1"
                               className="form-input"
                             />
-                            <ErrorMessage name="shippingInfo.address1" component="div" className="mt-1 text-sm text-wsb-error" />
+                            <ErrorMessage name="shippingInfo.address1" component="div" className="mt-1 text-sm text-destructive" />
                           </div>
 
                           <div>
                             <label htmlFor="shippingInfo.address2" className="form-label">
-                              Address Line 2 <span className="text-wsb-text-secondary">(Optional)</span>
+                              Address Line 2 <span className="text-muted-foreground">(Optional)</span>
                             </label>
                             <Field
                               type="text"
@@ -273,7 +273,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                                 name="shippingInfo.city"
                                 className="form-input"
                               />
-                              <ErrorMessage name="shippingInfo.city" component="div" className="mt-1 text-sm text-wsb-error" />
+                              <ErrorMessage name="shippingInfo.city" component="div" className="mt-1 text-sm text-destructive" />
                             </div>
                             <div>
                               <label htmlFor="shippingInfo.state" className="form-label">State/Province</label>
@@ -283,7 +283,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                                 name="shippingInfo.state"
                                 className="form-input"
                               />
-                              <ErrorMessage name="shippingInfo.state" component="div" className="mt-1 text-sm text-wsb-error" />
+                              <ErrorMessage name="shippingInfo.state" component="div" className="mt-1 text-sm text-destructive" />
                             </div>
                           </div>
 
@@ -296,7 +296,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                                 name="shippingInfo.zipCode"
                                 className="form-input"
                               />
-                              <ErrorMessage name="shippingInfo.zipCode" component="div" className="mt-1 text-sm text-wsb-error" />
+                              <ErrorMessage name="shippingInfo.zipCode" component="div" className="mt-1 text-sm text-destructive" />
                             </div>
                             <div>
                               <label htmlFor="shippingInfo.country" className="form-label">Country</label>
@@ -312,7 +312,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                                   </option>
                                 ))}
                               </Field>
-                              <ErrorMessage name="shippingInfo.country" component="div" className="mt-1 text-sm text-wsb-error" />
+                              <ErrorMessage name="shippingInfo.country" component="div" className="mt-1 text-sm text-destructive" />
                             </div>
                           </div>
                         </div>
@@ -326,7 +326,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                               type="checkbox"
                               id="billingInfo.useShippingAsBilling"
                               name="billingInfo.useShippingAsBilling"
-                              className="h-4 w-4 text-wsb-primary bg-gray-700 border-gray-600 rounded focus:ring-wsb-primary"
+                              className="h-4 w-4 text-primary bg-secondary border-border rounded focus:ring-primary"
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 setFieldValue('billingInfo.useShippingAsBilling', e.target.checked);
                                 if (e.target.checked) {
@@ -335,7 +335,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                                 }
                               }}
                             />
-                            <label htmlFor="billingInfo.useShippingAsBilling" className="ml-2 text-wsb-text">
+                            <label htmlFor="billingInfo.useShippingAsBilling" className="ml-2 text-foreground">
                               Use shipping address for billing
                             </label>
                           </div>
@@ -348,7 +348,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                               name="billingInfo.cardholderName"
                               className="form-input"
                             />
-                            <ErrorMessage name="billingInfo.cardholderName" component="div" className="mt-1 text-sm text-wsb-error" />
+                            <ErrorMessage name="billingInfo.cardholderName" component="div" className="mt-1 text-sm text-destructive" />
                           </div>
 
                           <div>
@@ -360,7 +360,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                               placeholder="XXXX XXXX XXXX XXXX"
                               className="form-input"
                             />
-                            <ErrorMessage name="billingInfo.cardNumber" component="div" className="mt-1 text-sm text-wsb-error" />
+                            <ErrorMessage name="billingInfo.cardNumber" component="div" className="mt-1 text-sm text-destructive" />
                           </div>
 
                           <div className="grid grid-cols-3 gap-4">
@@ -373,7 +373,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                                 placeholder="MM"
                                 className="form-input"
                               />
-                              <ErrorMessage name="billingInfo.expiryMonth" component="div" className="mt-1 text-sm text-wsb-error" />
+                              <ErrorMessage name="billingInfo.expiryMonth" component="div" className="mt-1 text-sm text-destructive" />
                             </div>
                             <div>
                               <label htmlFor="billingInfo.expiryYear" className="form-label">Year</label>
@@ -384,7 +384,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                                 placeholder="YY"
                                 className="form-input"
                               />
-                              <ErrorMessage name="billingInfo.expiryYear" component="div" className="mt-1 text-sm text-wsb-error" />
+                              <ErrorMessage name="billingInfo.expiryYear" component="div" className="mt-1 text-sm text-destructive" />
                             </div>
                             <div>
                               <label htmlFor="billingInfo.cvv" className="form-label">CVV</label>
@@ -395,12 +395,12 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                                 placeholder="XXX"
                                 className="form-input"
                               />
-                              <ErrorMessage name="billingInfo.cvv" component="div" className="mt-1 text-sm text-wsb-error" />
+                              <ErrorMessage name="billingInfo.cvv" component="div" className="mt-1 text-sm text-destructive" />
                             </div>
                           </div>
 
-                          <div className="p-3 bg-gray-800 rounded-lg">
-                            <p className="text-wsb-text-secondary text-sm">
+                          <div className="p-3 glass rounded-lg">
+                            <p className="text-muted-foreground text-sm">
                               All payment data is encrypted using AES-256-GCM and stored locally in a secure vault.
                               Your card details are never sent to our servers.
                             </p>
@@ -409,7 +409,7 @@ export default function ProfileForm({ isOpen, onClose, profile }: ProfileFormPro
                       )}
 
                       {/* Form Actions */}
-                      <div className="flex justify-between pt-4 border-t border-gray-700">
+                      <div className="flex justify-between pt-4 border-t border-[rgba(255,255,255,0.08)]">
                         <button
                           type="button"
                           className="btn-secondary"

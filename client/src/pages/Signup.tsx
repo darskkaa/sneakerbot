@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate, Link } from 'react-router-dom';
 import { Zap, Mail, Lock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import ParticlesWaves from '../components/common/ParticlesWaves';
+
+const MESH_GRADIENT =
+  'radial-gradient(ellipse 60% 45% at 10% 15%, rgba(99,102,241,0.18) 0%, transparent 65%),' +
+  'radial-gradient(ellipse 50% 50% at 90% 85%, rgba(16,185,129,0.12) 0%, transparent 65%),' +
+  'radial-gradient(ellipse 40% 35% at 75% 10%, rgba(139,92,246,0.10) 0%, transparent 55%)';
 
 export default function Signup() {
   const { user, loading, signUp } = useAuth();
@@ -24,79 +30,93 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background px-4">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col items-center mb-8">
-          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary mb-4">
-            <Zap className="w-6 h-6 text-white" fill="white" />
-          </div>
-          <h1 className="text-2xl font-bold text-foreground">Create Account</h1>
-          <p className="text-sm text-muted-foreground mt-1">Get started with SneakerBot</p>
-        </div>
+    <div className="relative min-h-screen overflow-hidden" style={{ backgroundColor: '#030712' }}>
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: MESH_GRADIENT }}
+      />
+      <ParticlesWaves />
 
-        <div className="card p-6 space-y-4">
-          {error && (
-            <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-md bg-destructive/10 border border-destructive/20">
-              <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
-              <p className="text-sm text-destructive">{error}</p>
-            </div>
-          )}
-          {success && (
-            <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-md bg-success/10 border border-success/20">
-              <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />
-              <p className="text-sm text-success">Account created! Check your email to confirm.</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="form-label">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="form-input pl-9"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="form-label">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                <input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min. 8 characters"
-                  className="form-input pl-9"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={submitting || loading || success}
-              className="btn-primary w-full justify-center"
+      <div className="relative flex items-center justify-center min-h-screen px-4" style={{ zIndex: 2 }}>
+        <div className="w-full max-w-sm">
+          <div className="flex flex-col items-center mb-8">
+            <div className="flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
+              style={{
+                background: 'linear-gradient(135deg, hsl(239 84% 67%) 0%, hsl(260 80% 60%) 100%)',
+                boxShadow: '0 0 40px rgba(99,102,241,0.50)',
+              }}
             >
-              {submitting ? 'Creating account...' : 'Create Account'}
-            </button>
-          </form>
-        </div>
+              <Zap className="w-7 h-7 text-white" fill="white" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">Create Account</h1>
+            <p className="text-sm text-muted-foreground mt-1">Get started with SneakerBot</p>
+          </div>
 
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          Already have an account?{' '}
-          <Link to="/login" className="text-primary hover:text-primary/80 font-medium transition-colors">
-            Sign in
-          </Link>
-        </p>
+          <div className="glass-elevated p-6 space-y-4">
+            {error && (
+              <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg" style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)' }}>
+                <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
+                <p className="text-sm text-destructive">{error}</p>
+              </div>
+            )}
+            {success && (
+              <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg" style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)' }}>
+                <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />
+                <p className="text-sm text-success">Account created! Check your email to confirm.</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="email" className="form-label">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="form-input pl-9"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="password" className="form-label">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <input
+                    id="password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Min. 8 characters"
+                    className="form-input pl-9"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting || loading || success}
+                className="btn-primary w-full justify-center"
+              >
+                {submitting ? 'Creating account...' : 'Create Account'}
+              </button>
+            </form>
+          </div>
+
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Already have an account?{' '}
+            <Link to="/login" className="text-primary hover:text-primary/80 font-medium transition-colors">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

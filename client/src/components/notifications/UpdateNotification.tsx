@@ -43,20 +43,20 @@ export default function UpdateNotification({ type, onClose }: UpdateNotification
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
       >
-        <div className="max-w-sm w-full bg-wsb-dark-panel shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5">
+        <div className="max-w-sm w-full glass-elevated shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5">
           <div className="p-4">
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <InformationCircleIcon className="h-6 w-6 text-blue-500" aria-hidden="true" />
               </div>
               <div className="ml-3 w-0 flex-1 pt-0.5">
-                <p className="text-sm font-medium text-wsb-text">{title}</p>
-                <p className="mt-1 text-sm text-wsb-text-secondary">{message}</p>
+                <p className="text-sm font-medium text-foreground">{title}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{message}</p>
                 {action && <div className="mt-3">{action}</div>}
               </div>
               <div className="ml-4 flex-shrink-0 flex">
                 <button
-                  className="bg-wsb-dark-panel rounded-md inline-flex text-wsb-text-secondary hover:text-wsb-text focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-wsb-primary"
+                  className="glass-elevated rounded-md inline-flex text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                   onClick={onClose}
                 >
                   <span className="sr-only">Close</span>

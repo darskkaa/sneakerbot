@@ -135,25 +135,25 @@ export default function AccountGenerator({ isOpen, onClose, onSuccess }: Account
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-wsb-dark-panel rounded-lg p-6 w-full max-w-md mx-4">
+    <div className="fixed inset-0 dialog-backdrop flex items-center justify-center z-50">
+      <div className="glass-elevated p-6 w-full max-w-md mx-4">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-wsb-text">
+          <h2 className="text-xl font-bold text-foreground">
             {step === 'generating' && 'Generate Account'}
             {step === 'verification' && 'Verify Account'}
             {step === 'success' && 'Account Created!'}
           </h2>
           <button
             onClick={handleClose}
-            className="text-wsb-text-secondary hover:text-wsb-text"
+            className="text-muted-foreground hover:text-foreground"
           >
-            ✕
+            ×
           </button>
         </div>
 
         {step === 'generating' && (
           <div className="space-y-4">
-            <p className="text-wsb-text-secondary">
+            <p className="text-muted-foreground">
               Click the button below to generate a new account. This process may take a few moments.
             </p>
             
@@ -176,12 +176,12 @@ export default function AccountGenerator({ isOpen, onClose, onSuccess }: Account
 
         {step === 'verification' && (
           <div className="space-y-4">
-            <div className="bg-wsb-dark-base p-4 rounded-lg">
-              <p className="text-wsb-text-secondary text-sm mb-2">Account Generated:</p>
-              <p className="text-wsb-text font-mono text-sm">{accountData?.email}</p>
+            <div className="glass p-4 rounded-lg">
+              <p className="text-muted-foreground text-sm mb-2">Account Generated:</p>
+              <p className="text-foreground font-mono text-sm">{accountData?.email}</p>
             </div>
             
-            <p className="text-wsb-text-secondary">
+            <p className="text-muted-foreground">
               A 6-digit verification code has been sent to the generated account. 
               Please enter any 6-digit code to complete the account setup.
             </p>
@@ -221,24 +221,24 @@ export default function AccountGenerator({ isOpen, onClose, onSuccess }: Account
 
         {step === 'success' && (
           <div className="space-y-4 text-center">
-            <div className="text-green-400 text-6xl mb-4">✓</div>
-            <h3 className="text-lg font-semibold text-wsb-text">Account Generated Successfully!</h3>
-            <div className="bg-wsb-dark-base p-4 rounded-lg">
-              <p className="text-wsb-text-secondary text-sm mb-2">Account Details:</p>
-              <p className="text-wsb-text font-mono text-sm">{accountData?.email}</p>
-              <p className="text-wsb-text-secondary text-xs mt-1">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full mx-auto mb-4" style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.30)' }}><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <h3 className="text-lg font-semibold text-foreground">Account Generated Successfully!</h3>
+            <div className="glass p-4 rounded-lg">
+              <p className="text-muted-foreground text-sm mb-2">Account Details:</p>
+              <p className="text-foreground font-mono text-sm">{accountData?.email}</p>
+              <p className="text-muted-foreground text-xs mt-1">
                 Password: {accountData?.password}
               </p>
             </div>
-            <p className="text-wsb-text-secondary text-sm">
+            <p className="text-muted-foreground text-sm">
               The account has been verified and is ready to use.
             </p>
           </div>
         )}
 
         {error && (
-          <div className="mt-4 p-3 bg-wsb-error bg-opacity-10 border border-wsb-error rounded-lg">
-            <p className="text-wsb-error text-sm">{error}</p>
+          <div className="mt-4 p-3 glass rounded-lg border-destructive/25 bg-destructive/10">
+            <p className="text-destructive text-sm">{error}</p>
           </div>
         )}
       </div>

@@ -44,7 +44,7 @@ export default function ParticlesWaves() {
     resize();
     window.addEventListener('resize', resize);
 
-    const count = window.innerWidth < 768 ? 40 : 72;
+    const count = window.innerWidth < 768 ? 45 : 85;
 
     const spawn = (): Particle => ({
       x: Math.random() * canvas.width,
@@ -55,7 +55,7 @@ export default function ParticlesWaves() {
       speed: 0.20 + Math.random() * 0.38,
       freq: 0.0025 + Math.random() * 0.0055,
       phase: Math.random() * Math.PI * 2,
-      alpha: 0.30 + Math.random() * 0.42,
+      alpha: 0.35 + Math.random() * 0.45,
       colorIdx: Math.floor(Math.random() * COLORS.length),
       trail: [],
     });
@@ -69,7 +69,7 @@ export default function ParticlesWaves() {
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      time += 0.006;
+      time += 0.005;
 
       for (const p of particles) {
         // Dual-frequency wave for natural, non-repetitive motion
@@ -107,7 +107,7 @@ export default function ParticlesWaves() {
         // Soft glow halo
         const haloR = p.size * 6;
         const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, haloR);
-        grd.addColorStop(0, `rgba(${r},${g},${b},${p.alpha * 0.18})`);
+        grd.addColorStop(0, `rgba(${r},${g},${b},${p.alpha * 0.22})`);
         grd.addColorStop(1, `rgba(${r},${g},${b},0)`);
         ctx.beginPath();
         ctx.arc(p.x, p.y, haloR, 0, Math.PI * 2);
@@ -128,9 +128,9 @@ export default function ParticlesWaves() {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const d2 = dx * dx + dy * dy;
-          if (d2 < 100 * 100) {
+          if (d2 < 120 * 120) {
             const d = Math.sqrt(d2);
-            const a = (1 - d / 100) * 0.09;
+            const a = (1 - d / 120) * 0.09;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);

@@ -144,7 +144,7 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-50" />
+          <div className="fixed inset-0 dialog-backdrop" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -158,9 +158,9 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform rounded-2xl bg-wsb-dark-panel p-6 shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-md transform glass-elevated p-6 transition-all">
                 <div className="flex items-center justify-between mb-6">
-                  <Dialog.Title className="text-lg font-medium text-wsb-text">
+                  <Dialog.Title className="text-lg font-medium text-foreground">
                     {isEditing 
                       ? 'Edit Proxy' 
                       : isBulkMode 
@@ -169,7 +169,7 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
                   </Dialog.Title>
                   <button
                     type="button"
-                    className="text-wsb-text-secondary hover:text-wsb-text"
+                    className="text-muted-foreground hover:text-foreground"
                     onClick={onClose}
                   >
                     <XMarkIcon className="h-6 w-6" />
@@ -183,8 +183,8 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
                         type="button"
                         className={`px-4 py-2 text-sm font-medium rounded-md ${
                           !isBulkMode
-                            ? 'bg-wsb-primary text-white'
-                            : 'bg-gray-700 text-wsb-text-secondary hover:bg-gray-600'
+                            ? 'bg-primary text-white'
+                            : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                         }`}
                         onClick={() => setIsBulkMode(false)}
                       >
@@ -194,8 +194,8 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
                         type="button"
                         className={`px-4 py-2 text-sm font-medium rounded-md ${
                           isBulkMode
-                            ? 'bg-wsb-primary text-white'
-                            : 'bg-gray-700 text-wsb-text-secondary hover:bg-gray-600'
+                            ? 'bg-primary text-white'
+                            : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                         }`}
                         onClick={() => setIsBulkMode(true)}
                       >
@@ -223,7 +223,7 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
                             placeholder="e.g., Residential Proxies"
                             className="form-input"
                           />
-                          <ErrorMessage name="name" component="div" className="mt-1 text-sm text-wsb-error" />
+                          <ErrorMessage name="name" component="div" className="mt-1 text-sm text-destructive" />
                         </div>
 
                         <div>
@@ -235,7 +235,7 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
                             placeholder="e.g., 192.168.1.1 or proxy.example.com"
                             className="form-input"
                           />
-                          <ErrorMessage name="host" component="div" className="mt-1 text-sm text-wsb-error" />
+                          <ErrorMessage name="host" component="div" className="mt-1 text-sm text-destructive" />
                         </div>
 
                         <div>
@@ -249,7 +249,7 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
                             max="65535"
                             className="form-input"
                           />
-                          <ErrorMessage name="port" component="div" className="mt-1 text-sm text-wsb-error" />
+                          <ErrorMessage name="port" component="div" className="mt-1 text-sm text-destructive" />
                         </div>
 
                         <div>
@@ -265,12 +265,12 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
                             <option value="socks4">SOCKS4</option>
                             <option value="socks5">SOCKS5</option>
                           </Field>
-                          <ErrorMessage name="type" component="div" className="mt-1 text-sm text-wsb-error" />
+                          <ErrorMessage name="type" component="div" className="mt-1 text-sm text-destructive" />
                         </div>
 
                         <div>
                           <label htmlFor="username" className="form-label">
-                            Username <span className="text-wsb-text-secondary">(Optional)</span>
+                            Username <span className="text-muted-foreground">(Optional)</span>
                           </label>
                           <Field
                             type="text"
@@ -278,12 +278,12 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
                             name="username"
                             className="form-input"
                           />
-                          <ErrorMessage name="username" component="div" className="mt-1 text-sm text-wsb-error" />
+                          <ErrorMessage name="username" component="div" className="mt-1 text-sm text-destructive" />
                         </div>
 
                         <div>
                           <label htmlFor="password" className="form-label">
-                            Password <span className="text-wsb-text-secondary">(Optional)</span>
+                            Password <span className="text-muted-foreground">(Optional)</span>
                           </label>
                           <Field
                             type="password"
@@ -291,10 +291,10 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
                             name="password"
                             className="form-input"
                           />
-                          <ErrorMessage name="password" component="div" className="mt-1 text-sm text-wsb-error" />
+                          <ErrorMessage name="password" component="div" className="mt-1 text-sm text-destructive" />
                         </div>
 
-                        <div className="flex justify-between pt-4 border-t border-gray-700">
+                        <div className="flex justify-between pt-4 border-t border-[rgba(255,255,255,0.08)]">
                           <button
                             type="button"
                             className="btn-secondary"
@@ -356,7 +356,7 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
                             placeholder="e.g., Residential Proxies"
                             className="form-input"
                           />
-                          <ErrorMessage name="groupName" component="div" className="mt-1 text-sm text-wsb-error" />
+                          <ErrorMessage name="groupName" component="div" className="mt-1 text-sm text-destructive" />
                         </div>
 
                         <div>
@@ -372,7 +372,7 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
                             <option value="socks4">SOCKS4</option>
                             <option value="socks5">SOCKS5</option>
                           </Field>
-                          <ErrorMessage name="type" component="div" className="mt-1 text-sm text-wsb-error" />
+                          <ErrorMessage name="type" component="div" className="mt-1 text-sm text-destructive" />
                         </div>
 
                         <div>
@@ -385,13 +385,13 @@ export default function ProxyForm({ isOpen, onClose, proxy }: ProxyFormProps) {
                             placeholder="ip:port or ip:port:username:password (one per line)"
                             className="form-input"
                           />
-                          <ErrorMessage name="proxies" component="div" className="mt-1 text-sm text-wsb-error" />
-                          <p className="mt-1 text-xs text-wsb-text-secondary">
+                          <ErrorMessage name="proxies" component="div" className="mt-1 text-sm text-destructive" />
+                          <p className="mt-1 text-xs text-muted-foreground">
                             Format: ip:port or ip:port:username:password (one per line)
                           </p>
                         </div>
 
-                        <div className="flex justify-between pt-4 border-t border-gray-700">
+                        <div className="flex justify-between pt-4 border-t border-[rgba(255,255,255,0.08)]">
                           <button
                             type="button"
                             className="btn-secondary"
