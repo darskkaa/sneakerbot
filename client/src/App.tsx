@@ -1,4 +1,5 @@
 import { createContext, useContext, useCallback } from 'react';
+import ParticlesWaves from './components/common/ParticlesWaves';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -50,23 +51,39 @@ function RequireAuth({ children }: { children: JSX.Element }) {
   return children;
 }
 
+const MESH_GRADIENT =
+  'radial-gradient(ellipse 55% 40% at 12% 18%, rgba(99,102,241,0.14) 0%, transparent 70%),' +
+  'radial-gradient(ellipse 45% 45% at 88% 80%, rgba(16,185,129,0.09) 0%, transparent 70%),' +
+  'radial-gradient(ellipse 38% 32% at 72% 8%,  rgba(245,158,11,0.07)  0%, transparent 60%),' +
+  'radial-gradient(ellipse 40% 35% at 30% 90%, rgba(99,102,241,0.06)  0%, transparent 60%)';
+
 function AuthLayout() {
   return (
-    <div className="flex h-screen overflow-hidden bg-mesh">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-6 max-w-[1400px] mx-auto">
-          <Routes>
-            <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
-            <Route path="/tasks" element={<RequireAuth><Tasks /></RequireAuth>} />
-            <Route path="/tasks/:id" element={<RequireAuth><TaskDetail /></RequireAuth>} />
-            <Route path="/profiles" element={<RequireAuth><Profiles /></RequireAuth>} />
-            <Route path="/proxies" element={<RequireAuth><Proxies /></RequireAuth>} />
-            <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-      </main>
+    <div className="h-screen overflow-hidden relative" style={{ backgroundColor: '#060b16' }}>
+      {/* Static ambient gradient */}
+      <div
+        aria-hidden="true"
+        style={{ position: 'absolute', inset: 0, background: MESH_GRADIENT, zIndex: 0, pointerEvents: 'none' }}
+      />
+      {/* Animated particle waves */}
+      <ParticlesWaves />
+      {/* All app content — sits above particles */}
+      <div className="flex h-full w-full" style={{ position: 'relative', zIndex: 2 }}>
+        <Sidebar />
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-6 max-w-[1400px] mx-auto">
+            <Routes>
+              <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
+              <Route path="/tasks" element={<RequireAuth><Tasks /></RequireAuth>} />
+              <Route path="/tasks/:id" element={<RequireAuth><TaskDetail /></RequireAuth>} />
+              <Route path="/profiles" element={<RequireAuth><Profiles /></RequireAuth>} />
+              <Route path="/proxies" element={<RequireAuth><Proxies /></RequireAuth>} />
+              <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
