@@ -1,0 +1,6 @@
+{
+  "outputDirectory": "client/dist",
+  "buildCommand": "cd client && npm run build",
+  "installCommand": "cd client && npm install",
+  "framework": null
+}
