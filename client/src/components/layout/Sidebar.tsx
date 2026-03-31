@@ -30,9 +30,9 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="flex flex-col w-[220px] min-w-[220px] bg-card border-r border-border">
+    <aside className="flex flex-col w-[220px] min-w-[220px] glass-sidebar">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 h-14 px-4 border-b border-border">
+      <div className="flex items-center gap-2.5 h-14 px-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
         <div className="flex items-center justify-center w-7 h-7 rounded-md bg-primary">
           <Zap className="w-4 h-4 text-white" fill="white" />
         </div>
@@ -73,7 +73,7 @@ export default function Sidebar() {
       </nav>
 
       {/* User section */}
-      <div className="border-t border-border p-3">
+      <div className="p-3" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
         <div className="flex items-center gap-3 px-2 py-2 rounded-md">
           <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
             <span className="text-xs font-semibold text-primary">

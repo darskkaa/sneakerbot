@@ -125,7 +125,7 @@ export default function TaskList({ onAddTask }: TaskListProps) {
     <>
       <div className="space-y-3">
         {selected.length > 0 && (
-          <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-primary/5 border border-primary/20 animate-fade-in">
+          <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg animate-fade-in" style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.22)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
             <span className="text-xs font-medium text-primary">{selected.length} selected</span>
             <div className="flex items-center gap-2 ml-auto">
               <button className="btn-secondary btn-sm gap-1.5" onClick={bulkStart}>
@@ -145,7 +145,7 @@ export default function TaskList({ onAddTask }: TaskListProps) {
           <div className="overflow-x-auto">
             <table className="data-table">
               <thead>
-                <tr className="border-b border-border bg-secondary/20">
+                <tr style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
                   <th className="px-4 py-3 w-10">
                     <input
                       type="checkbox"

@@ -133,7 +133,7 @@ export default function ProxyList({ proxies, onEdit }: ProxyListProps) {
     <div className="space-y-3">
       {/* Bulk bar */}
       {selected.length > 0 && (
-        <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-primary/5 border border-primary/20 animate-fade-in">
+        <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg animate-fade-in" style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.22)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
           <span className="text-xs font-medium text-primary">{selected.length} selected</span>
           <div className="flex items-center gap-2 ml-auto">
             <button className="btn-secondary btn-sm gap-1.5" onClick={handleTestSelected} disabled={testing.length > 0}>
@@ -154,7 +154,10 @@ export default function ProxyList({ proxies, onEdit }: ProxyListProps) {
           <div key={groupName} className="card overflow-hidden">
             {/* Group header */}
             <button
-              className="w-full flex items-center gap-3 px-4 py-3 bg-secondary/20 hover:bg-secondary/40 transition-colors border-b border-border"
+              className="w-full flex items-center gap-3 px-4 py-3 transition-colors cursor-pointer"
+              style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
               onClick={() => toggleGroup(groupName)}
             >
               <Folder className="w-4 h-4 text-primary flex-shrink-0" />
