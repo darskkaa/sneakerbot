@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '../lib/supabaseClient';
 import { Task } from '../types/models';
 
-// Define types for our context
 interface Profile {
   id: string;
   name: string;
@@ -19,10 +19,10 @@ interface Profile {
   };
   billingInfo: {
     cardholderName: string;
-    cardNumber: string; // This should be encrypted in actual implementation
+    cardNumber: string;
     expiryMonth: string;
     expiryYear: string;
-    cvv: string; // This should be encrypted in actual implementation
+    cvv: string;
     useShippingAsBilling: boolean;
   };
 }
@@ -37,6 +37,7 @@ interface Proxy {
   type: 'http' | 'https' | 'socks4' | 'socks5';
   status: 'untested' | 'working' | 'failed' | 'Healthy' | 'Slow' | 'Banned' | 'Unknown';
   lastTested?: Date;
+  responseTime?: number;
 }
 
 interface Settings {
@@ -51,20 +52,18 @@ interface Settings {
 
 interface DashboardStats {
   totalCheckouts: number;
-  successRate: number; // percentage
+  successRate: number;
   activeTasks: number;
   failedAttempts: number;
-  // Potentially add more stats as needed
 }
 
 export interface ActivityLog {
-  id: string; // or number
-  type: 'checkout_success' | 'task_created' | 'proxy_failed' | 'profile_updated' | 'settings_changed' | 'success' | 'failure' | 'info' | 'warning'; // Example types
+  id: string;
+  type: 'checkout_success' | 'checkout_failure' | 'task_created' | 'task_started' | 'task_stopped' | 'proxy_failed' | 'proxy_success' | 'profile_updated' | 'settings_changed' | 'stock_detected' | 'info' | 'warning';
   content: string;
   details?: string;
-  timestamp: string; // ISO string or Date object
-  user?: string; // Optional: if actions are user-specific
-  relatedId?: string | number; // Optional: ID of related task, profile, proxy etc.
+  timestamp: string;
+  relatedId?: string;
 }
 
 interface AppContextType {
@@ -79,8 +78,8 @@ interface AppContextType {
     profiles: boolean;
     proxies: boolean;
     settings: boolean;
-    stats: boolean; // Added for dashboard stats loading
-    activities: boolean; // Added for activities loading
+    stats: boolean;
+    activities: boolean;
   };
   addTask: (task: Omit<Task, 'id' | 'status' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateTask: (id: number, updates: Partial<Task>) => Promise<Task | undefined>;
@@ -95,50 +94,84 @@ interface AppContextType {
   deleteProxy: (id: string) => Promise<void>;
   testProxy: (id: string) => Promise<void>;
   updateSettings: (updates: Partial<Settings>) => Promise<void>;
-  getTask: (id: number) => Promise<Task | undefined>; // For fetching a single task
+  getTask: (id: number) => Promise<Task | undefined>;
 }
 
-// Create the context with a default value
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Helper to get default settings
 const getDefaultSettings = (): Settings => ({
   captchaProvider: 'manual',
   defaultCheckoutDelay: 3000,
   riskMode: 'balanced',
   autoUpdateEnabled: true,
-  // Ensure all non-optional Settings fields have defaults
-  captchaApiKey: undefined, // Or a default empty string if appropriate
-  discordWebhook: undefined,
-  slackWebhook: undefined,
 });
 
-// Placeholder for fetching/updating stats and activities
-const fetchDashboardStats = async (): Promise<DashboardStats> => {
-  // Simulate API call or fetch from window.api if available
-  console.log('Fetching dashboard stats...');
-  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate delay
-  // In a real app, this might be: await window.api.getDashboardStats();
-  return {
-    totalCheckouts: 120,
-    successRate: 85,
-    activeTasks: 5,
-    failedAttempts: 15,
-  };
-};
+// Map Supabase task row → Task
+const mapTask = (row: any): Task => ({
+  id: row.id,
+  name: row.name,
+  site: row.site,
+  productUrl: row.product_url,
+  sku: row.sku,
+  size: row.size,
+  status: row.status,
+  message: row.message,
+  profile: row.profile_id,
+  createdAt: new Date(row.created_at),
+  updatedAt: new Date(row.updated_at),
+  logs: row.logs ?? [],
+});
 
-const fetchActivities = async (): Promise<ActivityLog[]> => {
-  // Simulate API call or fetch from window.api if available
-  console.log('Fetching activities...');
-  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate delay
-  // In a real app, this might be: await window.api.getActivities();
-  return [
-    { id: '1', type: 'checkout_success', content: 'Checkout for Yeezy Boost 350', timestamp: new Date().toISOString() },
-    { id: '2', type: 'task_created', content: 'New task created for Supreme drop', timestamp: new Date().toISOString() },
-  ];
-};
+// Map Supabase profile row → Profile
+const mapProfile = (row: any): Profile => ({
+  id: row.id,
+  name: row.name,
+  shippingInfo: {
+    firstName: row.first_name ?? '',
+    lastName: row.last_name ?? '',
+    email: row.email,
+    phone: row.phone ?? '',
+    address1: row.address,
+    address2: row.address2,
+    city: row.city,
+    state: row.state,
+    zipCode: row.zip,
+    country: row.country,
+  },
+  billingInfo: {
+    cardholderName: row.card_holder,
+    cardNumber: row.card_number_encrypted,
+    expiryMonth: (row.card_expiry ?? '/').split('/')[0] ?? '',
+    expiryYear: (row.card_expiry ?? '/').split('/')[1] ?? '',
+    cvv: row.card_cvv_encrypted,
+    useShippingAsBilling: false,
+  },
+});
 
-// Custom hook to use the context
+// Map Supabase proxy row → Proxy
+const mapProxy = (row: any): Proxy => ({
+  id: row.id,
+  name: row.name,
+  host: row.host,
+  port: row.port,
+  username: row.username,
+  password: row.password,
+  type: row.type,
+  status: row.status,
+  lastTested: row.last_tested ? new Date(row.last_tested) : undefined,
+  responseTime: row.response_time,
+});
+
+// Map Supabase activity row → ActivityLog
+const mapActivity = (row: any): ActivityLog => ({
+  id: row.id,
+  type: row.type,
+  content: row.content,
+  details: row.details,
+  timestamp: row.created_at,
+  relatedId: row.related_id,
+});
+
 export const useAppContext = () => {
   const context = useContext(AppContext);
   if (context === undefined) {
@@ -147,380 +180,321 @@ export const useAppContext = () => {
   return context;
 };
 
-// Provider component that wraps the app
-interface AppContextProviderProps {
-  children: ReactNode;
-}
-
-export const AppContextProvider = ({ children }: AppContextProviderProps): JSX.Element => {
-  // State for all our data
+export const AppContextProvider = ({ children }: { children: ReactNode }): JSX.Element => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [proxies, setProxies] = useState<Proxy[]>([]);
-  const [settings, setSettings] = useState<Settings>(getDefaultSettings()); // Initialize with defaults
-  const [stats, setStats] = useState<DashboardStats | null>(null); // Added stats state
-  const [activities, setActivities] = useState<ActivityLog[]>([]); // Added activities state
+  const [settings, setSettings] = useState<Settings>(getDefaultSettings());
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState({
     tasks: true,
     profiles: true,
     proxies: true,
     settings: true,
-    stats: true, // Added stats loading state
-    activities: true // Added activities loading state
+    stats: true,
+    activities: true,
   });
 
-  // Load initial data
   useEffect(() => {
     const loadData = async () => {
-      try {
-        // Load tasks
-        setLoading(prev => ({ ...prev, tasks: true }));
-        const tasksData = await (window.api.getAllTasks?.() ?? []);
-        setTasks(tasksData);
-        setLoading(prev => ({ ...prev, tasks: false }));
-        
-        // Load profiles
-        setLoading(prev => ({ ...prev, profiles: true }));
-        const profilesData = await (window.api.getProfiles?.() ?? []);
-        setProfiles(profilesData);
-        setLoading(prev => ({ ...prev, profiles: false }));
-        
-        // Load proxies
-        setLoading(prev => ({ ...prev, proxies: true }));
-        const proxiesData = await (window.api.getProxies?.() ?? []);
-        setProxies(proxiesData);
-        setLoading(prev => ({ ...prev, proxies: false }));
-        
-        // Load settings
-        setLoading(prev => ({ ...prev, settings: true }));
-        // Load settings
-        setLoading(prev => ({ ...prev, settings: true }));
-        if (window.api.getSettings) {
-          const settingsData = await window.api.getSettings();
-          if (settingsData) setSettings(settingsData); else setSettings(getDefaultSettings());
-        } else {
-          setSettings(getDefaultSettings()); // Fallback if API not present
-        }
-        setLoading(prev => ({ ...prev, settings: false }));
-        
-        // Load stats
-        setLoading(prev => ({ ...prev, stats: true }));
-        try {
-          const statsData = await fetchDashboardStats();
-          setStats(statsData);
-        } catch (error) {
-          console.error('Failed to fetch dashboard stats:', error);
-          setStats(null); // Or some default error state for stats
-        }
-        setLoading(prev => ({ ...prev, stats: false }));
-        
-        // Load activities
-        setLoading(prev => ({ ...prev, activities: true }));
-        try {
-          const activitiesData = await fetchActivities();
-          setActivities(activitiesData);
-        } catch (error) {
-          console.error('Failed to fetch activities:', error);
-          setActivities([]); // Or some default error state for activities
-        }
-        setLoading(prev => ({ ...prev, activities: false }));
-      } catch (error) {
-        console.error('Error loading data:', error);
-        // Reset loading states
-        setLoading({
-          tasks: false,
-          profiles: false,
-          proxies: false,
-          settings: false,
-          stats: false,
-          activities: false
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Tasks
+      const { data: tasksData } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      setTasks((tasksData ?? []).map(mapTask));
+      setLoading(prev => ({ ...prev, tasks: false }));
+
+      // Profiles
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      setProfiles((profilesData ?? []).map(mapProfile));
+      setLoading(prev => ({ ...prev, profiles: false }));
+
+      // Proxies
+      const { data: proxiesData } = await supabase
+        .from('proxies')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      setProxies((proxiesData ?? []).map(mapProxy));
+      setLoading(prev => ({ ...prev, proxies: false }));
+
+      // Settings
+      const { data: settingsData } = await supabase
+        .from('settings')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      if (settingsData) {
+        setSettings({
+          captchaProvider: settingsData.captcha_provider ?? 'manual',
+          captchaApiKey: settingsData.captcha_api_key,
+          discordWebhook: settingsData.discord_webhook,
+          slackWebhook: settingsData.slack_webhook,
+          defaultCheckoutDelay: settingsData.checkout_delay ?? 3000,
+          riskMode: settingsData.risk_mode ?? 'balanced',
+          autoUpdateEnabled: settingsData.auto_update_enabled ?? true,
+        });
+      }
+      setLoading(prev => ({ ...prev, settings: false }));
+
+      // Stats (computed from tasks + activity_logs)
+      const { data: allTasks } = await supabase
+        .from('tasks')
+        .select('status')
+        .eq('user_id', user.id);
+      const taskList = allTasks ?? [];
+      const totalCheckouts = taskList.filter(t => t.status === 'success').length;
+      const failedAttempts = taskList.filter(t => t.status === 'error').length;
+      const activeTasks = taskList.filter(t => t.status === 'running' || t.status === 'monitoring').length;
+      const total = totalCheckouts + failedAttempts;
+      setStats({
+        totalCheckouts,
+        successRate: total > 0 ? Math.round((totalCheckouts / total) * 100) : 0,
+        activeTasks,
+        failedAttempts,
+      });
+      setLoading(prev => ({ ...prev, stats: false }));
+
+      // Activity logs
+      const { data: logsData } = await supabase
+        .from('activity_logs')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      setActivities((logsData ?? []).map(mapActivity));
+      setLoading(prev => ({ ...prev, activities: false }));
+
+      // Electron real-time task updates (optional)
+      if (typeof window !== 'undefined' && window.api?.on) {
+        window.api.on('task-update', (updatedTask: Task) => {
+          setTasks(prev => {
+            const idx = prev.findIndex(t => t.id === updatedTask.id);
+            if (idx !== -1) {
+              const next = [...prev];
+              next[idx] = updatedTask;
+              return next;
+            }
+            return [...prev, updatedTask];
+          });
         });
       }
     };
-    
+
     loadData();
-    
-    // Set up listeners for real-time updates
-    const removeTaskUpdateListener = window.api.on('task-update', (updatedTask: Task) => {
-      setTasks(prevTasks => {
-        const index = prevTasks.findIndex(task => task.id === updatedTask.id);
-        if (index !== -1) {
-          const newTasks = [...prevTasks];
-          newTasks[index] = updatedTask;
-          return newTasks;
-        }
-        return [...prevTasks, updatedTask];
-      });
-    });
-    
-    return () => {
-      // Clean up listeners
-      removeTaskUpdateListener?.();
-    };
   }, []);
 
-  // Functions for managing tasks
   const addTask = async (task: Omit<Task, 'id' | 'status' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      let newTask = null;
-      if (window.api.createTask) {
-        newTask = await window.api.createTask(task);
-      } else {
-        // Fallback or error handling if createTask is not available
-        console.error('createTask API method not found');
-        // Optionally, simulate task creation for UI testing if needed
-        // newTask = { ...task, id: Date.now(), status: 'idle', createdAt: new Date(), updatedAt: new Date() };
-      }
-      if (newTask) setTasks(prevTasks => [...prevTasks, newTask]);
-    } catch (error) {
-      console.error('Error adding task:', error);
-      throw error;
-    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data, error } = await supabase.from('tasks').insert({
+      user_id: user.id,
+      name: task.name,
+      site: task.site,
+      product_url: task.productUrl,
+      sku: task.sku,
+      size: task.size,
+      status: 'idle',
+      profile_id: task.profile ?? null,
+    }).select().single();
+    if (error) throw error;
+    setTasks(prev => [mapTask(data), ...prev]);
+    await supabase.from('activity_logs').insert({ user_id: user.id, type: 'task_created', content: `Task created: ${task.name ?? task.site}` });
   };
 
   const updateTask = async (id: number, updates: Partial<Task>) => {
-    try {
-      let updatedTask: Task | undefined = undefined;
-      if (window.api.updateTask) {
-        // Assuming window.api.updateTask itself might not return the full updated task
-        // or we want to ensure our local state version is the source of truth after update.
-        await window.api.updateTask(id, updates);
-        setTasks(prevTasks => {
-          const newTasks = prevTasks.map(t => {
-            if (t.id === id) {
-              updatedTask = { ...t, ...updates, updatedAt: new Date() };
-              return updatedTask;
-            }
-            return t;
-          });
-          return newTasks;
-        });
-      } else {
-        // Fallback if API is not available (e.g. web-only mode without Electron)
-        setTasks(prevTasks => {
-          const newTasks = prevTasks.map(t => {
-            if (t.id === id) {
-              updatedTask = { ...t, ...updates, updatedAt: new Date() };
-              return updatedTask;
-            }
-            return t;
-          });
-          return newTasks;
-        });
-        console.warn('window.api.updateTask not available, updating locally.');
-      }
-      return updatedTask;
-    } catch (error) {
-      console.error('Error updating task:', error);
-      throw error;
-    }
+    const { data, error } = await supabase.from('tasks').update({
+      ...(updates.status && { status: updates.status }),
+      ...(updates.message !== undefined && { message: updates.message }),
+      updated_at: new Date().toISOString(),
+    }).eq('id', id).select().single();
+    if (error) throw error;
+    const updated = mapTask(data);
+    setTasks(prev => prev.map(t => t.id === id ? updated : t));
+    return updated;
   };
 
   const deleteTask = async (id: number) => {
-    try {
-      if (window.api.deleteTask) await window.api.deleteTask(id);
-      setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
-    } catch (error) {
-      console.error('Error deleting task:', error);
-      throw error;
-    }
+    const { error } = await supabase.from('tasks').delete().eq('id', id);
+    if (error) throw error;
+    setTasks(prev => prev.filter(t => t.id !== id));
   };
 
   const startTask = async (id: number) => {
-    try {
-      if (window.api.startTask) await window.api.startTask(id);
-      setTasks(prevTasks => 
-        prevTasks.map(task => 
-          task.id === id ? { ...task, status: 'running', updatedAt: new Date() } : task
-        )
-      );
-    } catch (error) {
-      console.error('Error starting task:', error);
-      throw error;
-    }
+    await updateTask(id, { status: 'running' });
+    if (window.api?.startTask) await window.api.startTask(id);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) await supabase.from('activity_logs').insert({ user_id: user.id, type: 'task_started', content: `Task started`, related_id: String(id) });
   };
 
   const stopTask = async (id: number) => {
-    try {
-      if (window.api.stopTask) await window.api.stopTask(id);
-      setTasks(prevTasks => 
-        prevTasks.map(task => 
-          task.id === id ? { ...task, status: 'idle', updatedAt: new Date() } : task
-        )
-      );
-    } catch (error) {
-      console.error('Error stopping task:', error);
-      throw error;
-    }
+    await updateTask(id, { status: 'idle' });
+    if (window.api?.stopTask) await window.api.stopTask(id);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) await supabase.from('activity_logs').insert({ user_id: user.id, type: 'task_stopped', content: `Task stopped`, related_id: String(id) });
   };
 
-  // Functions for managing profiles
   const addProfile = async (profile: Omit<Profile, 'id'>) => {
-    try {
-      const newProfile = window.api.saveProfile ? await window.api.saveProfile(profile) : null;
-      if (newProfile) setProfiles(prevProfiles => [...prevProfiles, newProfile]);
-    } catch (error) {
-      console.error('Error adding profile:', error);
-      throw error;
-    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const s = profile.shippingInfo;
+    const b = profile.billingInfo;
+    const { data, error } = await supabase.from('profiles').insert({
+      user_id: user.id,
+      name: profile.name,
+      first_name: s.firstName,
+      last_name: s.lastName,
+      email: s.email,
+      phone: s.phone,
+      address: s.address1,
+      address2: s.address2,
+      city: s.city,
+      state: s.state,
+      zip: s.zipCode,
+      country: s.country,
+      card_holder: b.cardholderName,
+      card_number_encrypted: b.cardNumber,
+      card_expiry: `${b.expiryMonth}/${b.expiryYear}`,
+      card_cvv_encrypted: b.cvv,
+    }).select().single();
+    if (error) throw error;
+    setProfiles(prev => [mapProfile(data), ...prev]);
   };
 
   const updateProfile = async (id: string, updates: Partial<Profile>) => {
-    try {
-      if (window.api.saveProfile) await window.api.saveProfile({ id, ...updates });
-      setProfiles(prevProfiles => 
-        prevProfiles.map(profile => 
-          profile.id === id ? { ...profile, ...updates } : profile
-        )
-      );
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      throw error;
+    const patch: any = {};
+    if (updates.name) patch.name = updates.name;
+    if (updates.shippingInfo) {
+      const s = updates.shippingInfo;
+      if (s.firstName) patch.first_name = s.firstName;
+      if (s.lastName) patch.last_name = s.lastName;
+      if (s.email) patch.email = s.email;
+      if (s.phone) patch.phone = s.phone;
+      if (s.address1) patch.address = s.address1;
+      if (s.address2 !== undefined) patch.address2 = s.address2;
+      if (s.city) patch.city = s.city;
+      if (s.state) patch.state = s.state;
+      if (s.zipCode) patch.zip = s.zipCode;
+      if (s.country) patch.country = s.country;
     }
+    if (updates.billingInfo) {
+      const b = updates.billingInfo;
+      if (b.cardholderName) patch.card_holder = b.cardholderName;
+      if (b.cardNumber) patch.card_number_encrypted = b.cardNumber;
+      if (b.expiryMonth || b.expiryYear) {
+        const existing = profiles.find(p => p.id === id);
+        patch.card_expiry = `${b.expiryMonth ?? existing?.billingInfo.expiryMonth ?? ''}/${b.expiryYear ?? existing?.billingInfo.expiryYear ?? ''}`;
+      }
+      if (b.cvv) patch.card_cvv_encrypted = b.cvv;
+    }
+    const { data, error } = await supabase.from('profiles').update(patch).eq('id', id).select().single();
+    if (error) throw error;
+    setProfiles(prev => prev.map(p => p.id === id ? mapProfile(data) : p));
   };
 
   const deleteProfile = async (id: string) => {
-    try {
-      if (window.api.deleteProfile) await window.api.deleteProfile(id);
-      setProfiles(prevProfiles => prevProfiles.filter(profile => profile.id !== id));
-    } catch (error) {
-      console.error('Error deleting profile:', error);
-      throw error;
-    }
+    const { error } = await supabase.from('profiles').delete().eq('id', id);
+    if (error) throw error;
+    setProfiles(prev => prev.filter(p => p.id !== id));
   };
 
-  // Functions for managing proxies
   const addProxy = async (proxy: Omit<Proxy, 'id' | 'status' | 'lastTested'>) => {
-    try {
-      const newProxy = window.api.saveProxy ? await window.api.saveProxy({
-        ...proxy,
-        status: 'untested',
-      }) : null;
-      if (newProxy) setProxies(prevProxies => [...prevProxies, newProxy]);
-    } catch (error) {
-      console.error('Error adding proxy:', error);
-      throw error;
-    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data, error } = await supabase.from('proxies').insert({
+      user_id: user.id,
+      name: proxy.name,
+      host: proxy.host,
+      port: proxy.port,
+      username: proxy.username,
+      password: proxy.password,
+      type: proxy.type,
+      status: 'untested',
+    }).select().single();
+    if (error) throw error;
+    setProxies(prev => [mapProxy(data), ...prev]);
   };
 
   const updateProxy = async (id: string, updates: Partial<Proxy>) => {
-    try {
-      if (window.api.saveProxy) await window.api.saveProxy({ id, ...updates });
-      setProxies(prevProxies => 
-        prevProxies.map(proxy => 
-          proxy.id === id ? { ...proxy, ...updates } : proxy
-        )
-      );
-    } catch (error) {
-      console.error('Error updating proxy:', error);
-      throw error;
-    }
+    const patch: any = {};
+    if (updates.status) patch.status = updates.status.toLowerCase();
+    if (updates.responseTime !== undefined) patch.response_time = updates.responseTime;
+    if (updates.lastTested) patch.last_tested = updates.lastTested.toISOString();
+    const { data, error } = await supabase.from('proxies').update(patch).eq('id', id).select().single();
+    if (error) throw error;
+    setProxies(prev => prev.map(p => p.id === id ? mapProxy(data) : p));
   };
 
   const deleteProxy = async (id: string) => {
-    try {
-      if (window.api.deleteProxy) await window.api.deleteProxy(id);
-      setProxies(prevProxies => prevProxies.filter(proxy => proxy.id !== id));
-    } catch (error) {
-      console.error('Error deleting proxy:', error);
-      throw error;
+    const { error } = await supabase.from('proxies').delete().eq('id', id);
+    if (error) throw error;
+    setProxies(prev => prev.filter(p => p.id !== id));
+  };
+
+  const testProxy = async (id: string) => {
+    await updateProxy(id, { status: 'untested' });
+    if (window.api?.testProxy) {
+      const result = await window.api.testProxy(id);
+      await updateProxy(id, {
+        status: result.success ? 'working' : 'failed',
+        lastTested: new Date(),
+        responseTime: result.responseTime,
+      });
+    } else {
+      // Web mode: mark as untested (real testing requires Electron)
+      await updateProxy(id, { status: 'untested', lastTested: new Date() });
     }
   };
 
-  // Patch testProxy to return void
-  const testProxyPatched = async (id: string): Promise<void> => {
-    try {
-      setProxies(prevProxies => 
-        prevProxies.map(proxy => 
-          proxy.id === id ? { ...proxy, status: 'untested' } : proxy
-        )
-      );
-      const result = window.api.testProxy ? await window.api.testProxy(id) : { success: false };
-      setProxies(prevProxies => 
-        prevProxies.map(proxy => 
-          proxy.id === id ? { 
-            ...proxy, 
-            status: result.success ? 'working' : 'failed',
-            lastTested: new Date()
-          } : proxy
-        )
-      );
-    } catch (error) {
-      console.error('Error testing proxy:', error);
-      setProxies(prevProxies => 
-        prevProxies.map(proxy => 
-          proxy.id === id ? { 
-            ...proxy, 
-            status: 'failed',
-            lastTested: new Date()
-          } : proxy
-        )
-      );
-      throw error;
-    }
-  };
-
-  // Function for updating settings
   const updateSettings = async (updates: Partial<Settings>) => {
-    try {
-      if (window.api.updateSettings) await window.api.updateSettings({ ...settings, ...updates });
-      setSettings(prevSettings => ({ ...prevSettings, ...updates }));
-    } catch (error) {
-      console.error('Error updating settings:', error);
-      throw error;
-    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const next = { ...settings, ...updates };
+    await supabase.from('settings').upsert({
+      user_id: user.id,
+      captcha_provider: next.captchaProvider,
+      captcha_api_key: next.captchaApiKey,
+      discord_webhook: next.discordWebhook,
+      slack_webhook: next.slackWebhook,
+      checkout_delay: next.defaultCheckoutDelay,
+      risk_mode: next.riskMode,
+      auto_update_enabled: next.autoUpdateEnabled,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' });
+    setSettings(next);
   };
 
   const getTask = async (id: number): Promise<Task | undefined> => {
-    try {
-      if (window.api.getTask) {
-        const task = await window.api.getTask(id);
-        // Optionally, update the local tasks state if the fetched task is newer or not present
-        if (task) {
-          setTasks(prevTasks => {
-            const existingIndex = prevTasks.findIndex(t => t.id === id);
-            if (existingIndex !== -1) {
-              const newTasks = [...prevTasks];
-              newTasks[existingIndex] = task;
-              return newTasks;
-            }
-            return [...prevTasks, task]; // Or handle as an error if task should already be in list
-          });
-        }
-        return task;
-      }
-      console.warn('window.api.getTask is not available.');
-      return undefined;
-    } catch (error) {
-      console.error(`Error fetching task ${id}:`, error);
-      throw error; // Or return undefined / handle error appropriately
-    }
+    const { data, error } = await supabase.from('tasks').select('*').eq('id', id).single();
+    if (error) return undefined;
+    const task = mapTask(data);
+    setTasks(prev => {
+      const idx = prev.findIndex(t => t.id === id);
+      if (idx !== -1) { const n = [...prev]; n[idx] = task; return n; }
+      return [...prev, task];
+    });
+    return task;
   };
 
-  // Define the context value
-  const contextValue = {
-    tasks,
-    profiles,
-    proxies,
-    settings, // Already initialized with getDefaultSettings()
-    stats,
-    activities,
-    loading,
-    addTask,
-    updateTask,
-    deleteTask,
-    startTask,
-    stopTask,
-    addProfile,
-    updateProfile,
-    deleteProfile,
-    addProxy,
-    updateProxy,
-    deleteProxy,
-    testProxy: testProxyPatched, // Use the patched version
-    updateSettings,
-    getTask,
-  };
-
-  return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={{
+      tasks, profiles, proxies, settings, stats, activities, loading,
+      addTask, updateTask, deleteTask, startTask, stopTask,
+      addProfile, updateProfile, deleteProfile,
+      addProxy, updateProxy, deleteProxy, testProxy,
+      updateSettings, getTask,
+    }}>
+      {children}
+    </AppContext.Provider>
+  );
 };

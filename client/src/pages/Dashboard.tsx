@@ -45,9 +45,11 @@ const StatCard = ({ title, value, icon }: StatCardProps) => (
 const ActivityItem = ({ activity }: { activity: ActivityLog }) => {
   const getActivityIcon = () => {
     switch (activity.type) {
-      case 'success':
+      case 'checkout_success':
+      case 'proxy_success':
         return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
-      case 'failure':
+      case 'checkout_failure':
+      case 'proxy_failed':
         return <XCircleIcon className="h-5 w-5 text-red-500" />;
       case 'warning':
         return <InformationCircleIcon className="h-5 w-5 text-yellow-500" />;
