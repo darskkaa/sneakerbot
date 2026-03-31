@@ -52,7 +52,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 
 function AuthLayout() {
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden bg-mesh">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <div className="p-6 max-w-[1400px] mx-auto">
@@ -97,10 +97,13 @@ function App() {
             position="bottom-right"
             theme="dark"
             toastOptions={{
-              classNames: {
-                toast: 'bg-card border border-border text-foreground shadow-lg',
-                title: 'text-foreground font-medium',
-                description: 'text-muted-foreground',
+              style: {
+                background: 'rgba(255,255,255,0.07)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                color: 'hsl(210, 40%, 98%)',
               },
             }}
           />

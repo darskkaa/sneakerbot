@@ -25,7 +25,7 @@ export function ConfirmDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative z-10 w-full max-w-sm mx-4 bg-card border border-border rounded-lg shadow-2xl p-5 animate-fade-in">
+      <div className="relative z-10 w-full max-w-sm mx-4 glass-elevated p-5 animate-fade-in">
         <div className="flex items-start gap-3 mb-4">
           <div className={cn('flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center', destructive ? 'bg-destructive/15' : 'bg-warning/15')}>
             <AlertTriangle className={cn('w-4 h-4', destructive ? 'text-destructive' : 'text-warning')} />
