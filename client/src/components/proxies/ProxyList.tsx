@@ -3,6 +3,7 @@ import { RefreshCw, Trash2, Pencil, ChevronDown, Folder, CheckCircle2, XCircle, 
 import { useAppContext } from '../../context/AppContext';
 import { useToast } from '../../App';
 import { LoadingSpinner } from '../common';
+import { ConfirmDialog } from '../ui/confirm-dialog';
 import { cn } from '../../lib/utils';
 
 interface Proxy {
@@ -64,6 +65,8 @@ export default function ProxyList({ proxies, onEdit }: ProxyListProps) {
   const [testing, setTesting] = useState<string[]>([]);
   const [deleting, setDeleting] = useState<string[]>([]);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
 
   const groups = proxies.reduce((acc, p) => {
     const k = p.name || 'Default Group';
@@ -99,6 +102,7 @@ export default function ProxyList({ proxies, onEdit }: ProxyListProps) {
       addToast({ type: 'error', title: 'Delete Failed', message: 'Could not delete proxy' });
     } finally {
       setDeleting(prev => prev.filter(x => x !== id));
+      setConfirmDelete(null);
     }
   };
 
@@ -114,7 +118,7 @@ export default function ProxyList({ proxies, onEdit }: ProxyListProps) {
   };
 
   const handleDeleteSelected = async () => {
-    if (!selected.length || !window.confirm(`Delete ${selected.length} proxies?`)) return;
+    if (!selected.length) return;
     setDeleting(prev => [...prev, ...selected]);
     for (const id of selected) {
       await deleteProxy(id).catch(() => {});
@@ -125,6 +129,7 @@ export default function ProxyList({ proxies, onEdit }: ProxyListProps) {
   };
 
   return (
+    <>
     <div className="space-y-3">
       {/* Bulk bar */}
       {selected.length > 0 && (
@@ -134,7 +139,7 @@ export default function ProxyList({ proxies, onEdit }: ProxyListProps) {
             <button className="btn-secondary btn-sm gap-1.5" onClick={handleTestSelected} disabled={testing.length > 0}>
               <RefreshCw className="w-3 h-3" /> Test Selected
             </button>
-            <button className="btn-destructive btn-sm gap-1.5" onClick={handleDeleteSelected} disabled={deleting.length > 0}>
+            <button className="btn-destructive btn-sm gap-1.5" onClick={() => setConfirmBulkDelete(true)} disabled={deleting.length > 0}>
               <Trash2 className="w-3 h-3" /> Delete
             </button>
           </div>
@@ -216,7 +221,7 @@ export default function ProxyList({ proxies, onEdit }: ProxyListProps) {
                               <Pencil className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => handleDelete(proxy.id)}
+                              onClick={() => setConfirmDelete(proxy.id)}
                               disabled={deleting.includes(proxy.id)}
                               className="btn-icon text-muted-foreground hover:text-destructive"
                               title="Delete"
@@ -235,5 +240,25 @@ export default function ProxyList({ proxies, onEdit }: ProxyListProps) {
         );
       })}
     </div>
+
+      <ConfirmDialog
+        isOpen={!!confirmDelete}
+        title="Delete Proxy"
+        description="This proxy will be permanently removed."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => confirmDelete && handleDelete(confirmDelete)}
+        onCancel={() => setConfirmDelete(null)}
+      />
+      <ConfirmDialog
+        isOpen={confirmBulkDelete}
+        title={`Delete ${selected.length} Proxies`}
+        description="These proxies will be permanently removed."
+        confirmLabel={`Delete ${selected.length}`}
+        destructive
+        onConfirm={() => { setConfirmBulkDelete(false); handleDeleteSelected(); }}
+        onCancel={() => setConfirmBulkDelete(false)}
+      />
+    </>
   );
 }

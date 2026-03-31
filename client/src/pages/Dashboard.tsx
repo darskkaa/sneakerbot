@@ -2,17 +2,18 @@ import { useState } from 'react';
 import {
   CheckCircle2,
   XCircle,
-  Clock,
   TrendingUp,
   Plus,
   Zap,
   Activity,
   ShoppingBag,
   AlertTriangle,
-  Info
+  Info,
+  Clock
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-import { LoadingSpinner, AccountGenerator } from '../components/common';
+import { AccountGenerator } from '../components/common';
+import { Skeleton } from '../components/ui/skeleton';
 import { cn } from '../lib/utils';
 import type { ActivityLog } from '../context/AppContext';
 
@@ -22,25 +23,47 @@ interface StatCardProps {
   icon: React.ReactNode;
   trend?: string;
   trendUp?: boolean;
-  accent?: string;
+  iconBg?: string;
 }
 
-const StatCard = ({ title, value, icon, trend, trendUp, accent = 'text-primary' }: StatCardProps) => (
-  <div className="stat-card group hover:border-border/80 transition-colors">
+const StatCard = ({ title, value, icon, trend, trendUp, iconBg = 'bg-secondary' }: StatCardProps) => (
+  <div className="card p-5 space-y-3 hover:border-border/80 transition-colors">
     <div className="flex items-start justify-between">
       <div className="space-y-1">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
+        <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">{title}</p>
         <p className="text-2xl font-bold text-foreground tabular-nums">{value}</p>
       </div>
-      <div className={cn('p-2 rounded-lg bg-secondary', accent)}>
-        {icon}
-      </div>
+      <div className={cn('p-2.5 rounded-lg', iconBg)}>{icon}</div>
     </div>
     {trend && (
       <p className={cn('text-xs font-medium', trendUp ? 'text-success' : 'text-muted-foreground')}>
-        {trend}
+        {trendUp ? '↑ ' : ''}{trend}
       </p>
     )}
+  </div>
+);
+
+const StatCardSkeleton = () => (
+  <div className="card p-5 space-y-3">
+    <div className="flex items-start justify-between">
+      <div className="space-y-2">
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="h-8 w-16" />
+      </div>
+      <Skeleton className="h-10 w-10 rounded-lg" />
+    </div>
+    <Skeleton className="h-3 w-20" />
+  </div>
+);
+
+const ActivitySkeleton = () => (
+  <div className="flex items-start gap-3 px-4 py-3">
+    <Skeleton className="w-4 h-4 rounded-full flex-shrink-0 mt-0.5" />
+    <div className="flex-1 space-y-1.5">
+      <Skeleton className="h-3.5 w-3/4" />
+      <Skeleton className="h-3 w-1/2" />
+    </div>
+    <Skeleton className="h-3 w-12 flex-shrink-0" />
   </div>
 );
 
@@ -80,42 +103,34 @@ export default function Dashboard() {
   const { stats, activities, loading } = useAppContext();
   const [showAccountGenerator, setShowAccountGenerator] = useState(false);
 
-  if (loading.stats || loading.activities) {
-    return (
-      <div className="flex items-center justify-center py-24">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  const dashboardStats: StatCardProps[] = [
+  const statsConfig: StatCardProps[] = [
     {
       title: 'Total Checkouts',
       value: stats?.totalCheckouts ?? 0,
-      icon: <ShoppingBag className="w-5 h-5" />,
-      accent: 'text-success',
+      icon: <ShoppingBag className="w-5 h-5 text-success" />,
+      iconBg: 'bg-success/10',
       trend: 'All time',
     },
     {
       title: 'Success Rate',
       value: `${stats?.successRate ?? 0}%`,
-      icon: <TrendingUp className="w-5 h-5" />,
-      accent: 'text-primary',
-      trend: stats?.successRate && stats.successRate > 60 ? 'Above average' : 'Session',
+      icon: <TrendingUp className="w-5 h-5 text-primary" />,
+      iconBg: 'bg-primary/10',
+      trend: (stats?.successRate ?? 0) > 60 ? 'Above average' : 'Session avg',
       trendUp: (stats?.successRate ?? 0) > 60,
     },
     {
       title: 'Active Tasks',
       value: stats?.activeTasks ?? 0,
-      icon: <Activity className="w-5 h-5" />,
-      accent: 'text-warning',
-      trend: stats?.activeTasks && stats.activeTasks > 0 ? 'Currently running' : 'No active tasks',
+      icon: <Activity className="w-5 h-5 text-warning" />,
+      iconBg: 'bg-warning/10',
+      trend: (stats?.activeTasks ?? 0) > 0 ? 'Currently running' : 'None running',
     },
     {
       title: 'Failed',
       value: stats?.failedAttempts ?? 0,
-      icon: <XCircle className="w-5 h-5" />,
-      accent: 'text-destructive',
+      icon: <XCircle className="w-5 h-5 text-destructive" />,
+      iconBg: 'bg-destructive/10',
       trend: 'All time',
     },
   ];
@@ -128,10 +143,7 @@ export default function Dashboard() {
           <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Monitor your bot performance</p>
         </div>
-        <button
-          onClick={() => setShowAccountGenerator(true)}
-          className="btn-primary text-xs gap-1.5"
-        >
+        <button onClick={() => setShowAccountGenerator(true)} className="btn-primary text-xs gap-1.5">
           <Plus className="w-3.5 h-3.5" />
           Generate Account
         </button>
@@ -139,9 +151,9 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {dashboardStats.map((stat, i) => (
-          <StatCard key={i} {...stat} />
-        ))}
+        {loading.stats
+          ? Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
+          : statsConfig.map((s, i) => <StatCard key={i} {...s} />)}
       </div>
 
       {/* Activity Feed */}
@@ -151,13 +163,15 @@ export default function Dashboard() {
             <Clock className="w-4 h-4 text-muted-foreground" />
             <h2 className="text-sm font-semibold text-foreground">Recent Activity</h2>
           </div>
-          <span className="text-xs text-muted-foreground">{activities.length} events</span>
+          {!loading.activities && (
+            <span className="text-xs text-muted-foreground">{activities.length} events</span>
+          )}
         </div>
-        <div className="divide-y divide-border/50 max-h-[420px] overflow-y-auto">
-          {activities.length > 0 ? (
-            activities.map((activity) => (
-              <ActivityItem key={activity.id} activity={activity} />
-            ))
+        <div className="divide-y divide-border/50 max-h-[400px] overflow-y-auto">
+          {loading.activities ? (
+            Array.from({ length: 5 }).map((_, i) => <ActivitySkeleton key={i} />)
+          ) : activities.length > 0 ? (
+            activities.map((a) => <ActivityItem key={a.id} activity={a} />)
           ) : (
             <div className="px-4 py-12 text-center">
               <Activity className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />
