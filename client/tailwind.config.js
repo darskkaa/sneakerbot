@@ -1,35 +1,89 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: ['class'],
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class', // or 'media' based on user preference
   theme: {
     extend: {
       colors: {
-        // Dark mode default colors according to UI guidelines
-        'wsb-dark-base': '#141414',
-        'wsb-dark-panel': '#1e1e1e',
-        'wsb-primary': '#3B82F6', // Blue
-        'wsb-success': '#10B981', // Green for successful checkouts
-        'wsb-error': '#EF4444',   // Red for errors
-        'wsb-warning': '#F59E0B', // Amber for warnings
-        'wsb-text': {
-          DEFAULT: '#F3F4F6', // Light text for dark mode
-          secondary: '#9CA3AF', // Secondary text
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        // Status colors
+        success: '#10b981',
+        warning: '#f59e0b',
+        danger: '#ef4444',
+        // Legacy compatibility
+        'dark-base': '#0f172a',
+        'dark-panel': '#1e293b',
+        // wsb- aliases for legacy components
+        'wsb-primary': '#6366f1',
+        'wsb-text': '#f8fafc',
+        'wsb-text-secondary': '#94a3b8',
+        'wsb-dark-base': '#0f172a',
+        'wsb-dark-panel': '#1e293b',
+        'wsb-error': '#ef4444',
+        'wsb-success': '#10b981',
+        'wsb-warning': '#f59e0b',
       },
-      spacing: {
-        '4pt': '4pt', // 4pt spacing grid per UI guidelines
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ['Inter var', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      keyframes: {
+        "fade-in": {
+          "0%": { opacity: "0", transform: "translateY(4px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "slide-in": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(0)" },
+        },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" },
+        },
+      },
+      animation: {
+        "fade-in": "fade-in 0.2s ease-out",
+        "slide-in": "slide-in 0.25s ease-out",
+        shimmer: "shimmer 1.5s infinite",
       },
       gridTemplateColumns: {
         'task-list': 'minmax(150px, 1fr) 2fr 1fr 1fr 100px',
       },
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/forms')],
 }

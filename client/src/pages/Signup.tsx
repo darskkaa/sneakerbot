@@ -1,54 +1,101 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate, Link } from 'react-router-dom';
-import { LoadingSpinner } from '../components/common';
+import { Zap, Mail, Lock, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function Signup() {
   const { user, loading, signUp } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   if (user) return <Navigate to="/" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
+    setError(null);
     const { error } = await signUp(email, password);
     if (error) setError(error.message);
-    else setError(null);
+    else setSuccess(true);
+    setSubmitting(false);
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-wsb-dark-base">
-      <div className="bg-wsb-dark-panel p-8 rounded-lg w-full max-w-md">
-        <h1 className="text-2xl font-bold text-white mb-6">Sign Up</h1>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <label className="block text-gray-400">Email</label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 mb-4 rounded bg-gray-800 text-white border border-gray-700 focus:border-wsb-primary focus:outline-none"
-          />
-          <label className="block text-gray-400">Password</label>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 mb-4 rounded bg-gray-800 text-white border border-gray-700 focus:border-wsb-primary focus:outline-none"
-          />
-          <button
-            type="submit"
-            className="w-full py-2 bg-wsb-primary text-white rounded"
-          >
-            {loading ? <LoadingSpinner size="sm" /> : 'Sign Up'}
-          </button>
-        </form>
-        <p className="mt-4 text-gray-400">
-          Already have an account? <Link to="/login" className="text-wsb-primary">Sign In</Link>
+    <div className="flex items-center justify-center min-h-screen bg-background px-4">
+      <div className="w-full max-w-sm">
+        <div className="flex flex-col items-center mb-8">
+          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary mb-4">
+            <Zap className="w-6 h-6 text-white" fill="white" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">Create Account</h1>
+          <p className="text-sm text-muted-foreground mt-1">Get started with SneakerBot</p>
+        </div>
+
+        <div className="card p-6 space-y-4">
+          {error && (
+            <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-md bg-destructive/10 border border-destructive/20">
+              <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
+              <p className="text-sm text-destructive">{error}</p>
+            </div>
+          )}
+          {success && (
+            <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-md bg-success/10 border border-success/20">
+              <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />
+              <p className="text-sm text-success">Account created! Check your email to confirm.</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="form-label">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="form-input pl-9"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="form-label">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Min. 8 characters"
+                  className="form-input pl-9"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={submitting || loading || success}
+              className="btn-primary w-full justify-center"
+            >
+              {submitting ? 'Creating account...' : 'Create Account'}
+            </button>
+          </form>
+        </div>
+
+        <p className="text-center text-sm text-muted-foreground mt-4">
+          Already have an account?{' '}
+          <Link to="/login" className="text-primary hover:text-primary/80 font-medium transition-colors">
+            Sign in
+          </Link>
         </p>
       </div>
     </div>
