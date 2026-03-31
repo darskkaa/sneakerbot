@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    @apply antialiased;
+  }
+  
+  body {
+    @apply h-screen overflow-hidden;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-wsb-primary;
+  }
+  
+  .btn-primary {
+    @apply btn bg-wsb-primary text-white hover:bg-blue-700;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-wsb-dark-panel text-wsb-text hover:bg-gray-800;
+  }
+  
+  .btn-success {
+    @apply btn bg-wsb-success text-white hover:bg-green-700;
+  }
+  
+  .btn-error {
+    @apply btn bg-wsb-error text-white hover:bg-red-700;
+  }
+  
+  .card {
+    @apply bg-wsb-dark-panel rounded-lg shadow-lg p-4;
+  }
+  
+  .form-input {
+    @apply block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-wsb-primary focus:border-wsb-primary bg-gray-800 text-wsb-text;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-wsb-text mb-1;
+  }
+  
+  .task-status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .status-idle {
+    @apply task-status-badge bg-gray-700 text-gray-200;
+  }
+  
+  .status-running {
+    @apply task-status-badge bg-blue-700 text-blue-100;
+  }
+  
+  .status-success {
+    @apply task-status-badge bg-green-700 text-green-100;
+  }
+  
+  .status-error {
+    @apply task-status-badge bg-red-700 text-red-100;
+  }
+}

@@ -1,0 +1,20 @@
+[build]
+  command = "cd client && npm install && VITE_API_URL=$DEPLOY_URL npm run build"
+  publish = "client/dist"
+  base = "/"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--prefix=client"
+
+[dev]
+  command = "cd client && npm run dev"
+  port = 5173
+  targetPort = 5173
+  publish = "client"
+  framework = "vite"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

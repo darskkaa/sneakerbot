@@ -1,0 +1,15 @@
+# Node
+node_modules/
+dist/
+build/
+.vite/
+.env*
+*.log
+*.tsbuildinfo
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+
+.vercel
