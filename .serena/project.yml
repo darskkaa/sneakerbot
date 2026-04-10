@@ -83,7 +83,7 @@ read_only: false
 #  * `get_symbols_overview`: Gets an overview of the top-level symbols defined in a given file.
 #  * `initial_instructions`: Gets the initial instructions for the current project.
 #     Should only be used in settings where the system prompt cannot be set,
-#     e.g. in clients you have no control over, like Claude Desktop.
+#     e.g. in clients you have no control over.
 #  * `insert_after_symbol`: Inserts content after the end of the definition of a given symbol.
 #  * `insert_at_line`: Inserts content at a given line in a file.
 #  * `insert_before_symbol`: Inserts content before the beginning of the definition of a given symbol.
