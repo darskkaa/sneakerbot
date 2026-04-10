@@ -22,7 +22,7 @@
     "cmdk": "^1.1.1",
     "formik": "^2.4.3",
     "lucide-react": "^1.7.0",
-    "react": "^18.2.0",
+    "react": "^19.2.5",
     "react-dom": "^18.2.0",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.15.0",
@@ -43,7 +43,7 @@
   "devDependencies": {
     "@testing-library/react": "^14.0.0",
     "@types/node": "^20.5.7",
-    "@types/react": "^18.2.21",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.5.0",
