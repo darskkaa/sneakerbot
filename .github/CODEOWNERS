@@ -1,0 +1,18 @@
+# Code ownership and review requirements
+# This file defines who should review PRs for different parts of the codebase
+
+# Default owner for everything not explicitly assigned below
+* @darskkaa
+
+# Frontend code
+/client/ @darskkaa
+/client/src/pages/ @darskkaa
+/client/src/components/ @darskkaa
+
+# Electron main process
+/electron/ @darskkaa
+
+# Security and configuration files
+SECURITY.md @darskkaa
+CONTRIBUTING.md @darskkaa
+package.json @darskkaa
