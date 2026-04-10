@@ -41,7 +41,7 @@ interface Proxy {
 }
 
 interface Settings {
-  captchaProvider: 'manual' | '2captcha' | 'capmonster' | 'aycd';
+  captchaProvider: 'manual' | 'provider_a' | 'provider_b' | 'provider_c';
   captchaApiKey?: string;
   discordWebhook?: string;
   slackWebhook?: string;

@@ -70,12 +70,12 @@ export default function TaskWizard({ isOpen, onClose, onTaskCreated }: TaskWizar
   
   // Available sites
   const sites = [
-    { id: 'nike', name: 'Nike' },
-    { id: 'snkrs', name: 'SNKRS' },
-    { id: 'footlocker', name: 'Footlocker' },
-    { id: 'eastbay', name: 'Eastbay' },
-    { id: 'finishline', name: 'Finish Line' },
-    { id: 'shopify', name: 'Shopify' },
+    { id: 'site_a', name: 'Site A' },
+    { id: 'site_b', name: 'Site B' },
+    { id: 'site_c', name: 'Site C' },
+    { id: 'site_d', name: 'Site D' },
+    { id: 'site_e', name: 'Site E' },
+    { id: 'site_f', name: 'Site F' },
   ];
   
   // Common sizes
@@ -145,7 +145,7 @@ export default function TaskWizard({ isOpen, onClose, onTaskCreated }: TaskWizar
                 type="text" 
                 id="productUrl" 
                 name="productUrl" 
-                placeholder="https://www.nike.com/t/dunk-low-retro-mens-shoes-87q0hf/DV0833-101"
+                placeholder="https://www.example.com/product/SKU-12345"
                 className="form-input"
               />
               <ErrorMessage name="productUrl" component="div" className="form-error" />

@@ -21,7 +21,7 @@ https://openssf.org/training/securing-your-software-supply-chain-with-sigstore-c
 
 **Repository selected:** https://github.com/darskkaa/sneakerbot
 
-SneakerBot is a cross-platform desktop automation tool built with Electron, React 18, TypeScript, and Supabase. It targets Nike, SNKRS, Shopify, and Footsites.
+SneakerBot is a cross-platform desktop automation tool built with Electron, React 18, TypeScript, and Supabase. It supports monitoring and purchasing from multiple online retailers.
 
 ### Badge 1 — OpenSSF Scorecard
 

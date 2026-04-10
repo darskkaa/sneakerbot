@@ -145,9 +145,9 @@ export default function Settings() {
             className="form-input w-52"
           >
             <option value="manual">Manual Solving</option>
-            <option value="2captcha">2Captcha</option>
-            <option value="capmonster">CapMonster</option>
-            <option value="aycd">AYCD AutoSolve</option>
+            <option value="provider_a">Provider A</option>
+            <option value="provider_b">Provider B</option>
+            <option value="provider_c">Provider C</option>
           </select>
         </SettingRow>
         {settings.captchaProvider !== 'manual' && (

@@ -26,8 +26,8 @@ class MockElectronApi {
       return Promise.resolve([
         {
           id: 1,
-          site: 'Nike',
-          productUrl: 'https://nike.com/t/dunk-low-retro-mens-shoes-87q0hf/DD1391-100',
+          site: 'Site A',
+          productUrl: 'https://www.example.com/product/SKU-DD1391-100',
           sku: 'DD1391-100',
           size: 'US 10',
           status: 'idle',

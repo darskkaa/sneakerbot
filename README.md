@@ -1,7 +1,7 @@
 # SneakerBot
 Created by Adil
 
-A powerful cross-platform automation tool for purchasing limited-edition sneakers from Nike, SNKRS, Shopify, and Footsites.
+A powerful cross-platform automation tool for monitoring and purchasing limited-edition items from supported online retailers.
 
 [![Version](https://img.shields.io/badge/version-0.9.0-blue.svg)](https://github.com/darskkaa/sneakerbot)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey.svg)](https://github.com/darskkaa/sneakerbot)
@@ -10,13 +10,13 @@ A powerful cross-platform automation tool for purchasing limited-edition sneaker
 
 ## Features
 
-- 🚀 Fast and reliable Nike.com and SNKRS automation
+- 🚀 Fast and reliable multi-retailer automation
 - 🔄 Proxy rotation with health checking
 - 🔐 Secure AES-256-GCM encrypted profile vault
-- 🧠 CAPTCHA solving integration (manual, 2Captcha, CapMonster, AYCD)
+- 🧠 CAPTCHA solving integration (manual and third-party solvers)
 - 📊 Real-time task monitoring and statistics
 - 🧙‍♂️ User-friendly wizard for task creation
-- 📱 Supports webhook notifications (Discord, Slack)
+- 📱 Supports webhook notifications
 
 ## Requirements
 

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git config:*)",
+      "Read(//c/Users/Dell User/**)",
+      "Bash(git credential:*)",
+      "Bash(node:*)",
+      "Skill(update-config)"
+    ]
+  }
+}
