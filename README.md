@@ -5,7 +5,8 @@ A powerful cross-platform automation tool for purchasing limited-edition sneaker
 
 [![Version](https://img.shields.io/badge/version-0.9.0-blue.svg)](https://github.com/darskkaa/sneakerbot)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey.svg)](https://github.com/darskkaa/sneakerbot)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR_NETLIFY_SITE_ID/deploy-status)](https://app.netlify.com/sites/YOUR_NETLIFY_SITE_NAME/deploys)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/darskkaa/sneakerbot/badge)](https://securityscorecards.dev/viewer?uri=github.com/darskkaa/sneakerbot)
+[![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/YOUR_PROJECT_ID/badge)](https://bestpractices.coreinfrastructure.org/projects/YOUR_PROJECT_ID)
 
 ## Features
 
