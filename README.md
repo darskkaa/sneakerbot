@@ -6,7 +6,7 @@ A powerful cross-platform automation tool for monitoring and purchasing limited-
 [![Version](https://img.shields.io/badge/version-0.9.0-blue.svg)](https://github.com/darskkaa/sneakerbot)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey.svg)](https://github.com/darskkaa/sneakerbot)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/darskkaa/sneakerbot/badge)](https://securityscorecards.dev/viewer?uri=github.com/darskkaa/sneakerbot)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12448/badge)](https://www.bestpractices.dev/projects/12448)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12448/badge?v=passing)](https://www.bestpractices.dev/en/projects/12448)
 
 ## Features
 
